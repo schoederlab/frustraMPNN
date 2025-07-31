@@ -49,20 +49,11 @@ echo -e "Reinstall: $reinstall"
 ############################################################################################################
 ################## CUDA confirmation
 if [ -z "$cuda" ]; then
-    echo -e "\n⚠️  WARNING: No CUDA version specified!"
-    echo -e "This will install a CPU-only version of PyTorch, which may significantly impact performance."
-    echo -e "If you have a CUDA-compatible GPU, consider using: --cuda 12.1 (or your CUDA version)"
+    echo -e "\n[!]  INFO: No CUDA version specified."
+    echo -e "The package manager will automatically detect and install the best PyTorch version for your system."
+    echo -e "This may include CUDA support if available, or fall back to CPU-only if no compatible CUDA is found."
+    echo -e "For explicit CUDA control, use: --cuda <version> (e.g., --cuda 12.1)"
     echo -e ""
-    read -p "Do you want to proceed with CPU-only installation? (y/N): " confirm
-    case $confirm in
-        [Yy]* ) 
-            echo -e "Proceeding with CPU-only installation..."
-            ;;
-        * ) 
-            echo -e "Installation cancelled. Use --cuda <version> for GPU support."
-            exit 1
-            ;;
-    esac
 fi
 
 ############################################################################################################
@@ -78,12 +69,12 @@ echo -e "Conda is installed at: $CONDA_BASE"
 # Check if frustraMPNN environment already exists
 if conda env list | grep -w 'frustraMPNN' >/dev/null 2>&1; then
     if [ "$reinstall" = true ]; then
-        echo -e "⚠️  frustraMPNN environment already exists, but reinstall requested."
+        echo -e "[!]  frustraMPNN environment already exists, but reinstall requested."
         echo -e "Removing existing environment..."
         conda env remove -n frustraMPNN -y || { echo -e "Error: Failed to remove existing frustraMPNN environment"; exit 1; }
-        echo -e "✓ Existing environment removed successfully"
+        echo -e "[o] Existing environment removed successfully"
     else
-        echo -e "⚠️  frustraMPNN environment already exists!"
+        echo -e "[!]  frustraMPNN environment already exists!"
         echo -e "Skipping installation and using existing environment."
         echo -e "To reinstall, use: $0 --reinstall"
         echo -e ""
@@ -110,7 +101,7 @@ import omegaconf
 import wandb
 import pyrosetta
 import frustrapy
-print('✓ All packages imported successfully')
+print('[o] All packages imported successfully')
 " || { echo -e "Error: Package import test failed"; exit 1; }
 
         # Test PyTorch CUDA availability
@@ -129,21 +120,21 @@ if torch.cuda.is_available():
     x = torch.randn(100, 100).to(device)
     y = torch.randn(100, 100).to(device)
     z = torch.mm(x, y)
-    print('✓ GPU tensor operations working')
+    print('[o] GPU tensor operations working')
 else:
-    print('⚠ CUDA not available - CPU-only installation')
+    print('[!] CUDA not available - CPU-only installation')
     # Test CPU operations
     x = torch.randn(100, 100)
     y = torch.randn(100, 100)
     z = torch.mm(x, y)
-    print('✓ CPU tensor operations working')
+    print('[o] CPU tensor operations working')
 "
 
         # Test ESM model loading
         echo -e "Testing ESM model import..."
         python -c "
 import esm
-print('✓ ESM model import successful')
+print('[o] ESM model import successful')
 " || { echo -e "Warning: ESM model test failed - this may affect some functionality"; }
 
         # Test PyRosetta initialization
@@ -151,35 +142,35 @@ print('✓ ESM model import successful')
         python -c "
 import pyrosetta
 pyrosetta.init('-mute all')
-print('✓ PyRosetta initialization successful')
+print('[o] PyRosetta initialization successful')
 " || { echo -e "Warning: PyRosetta initialization failed - this may affect some functionality"; }
 
         # Test frustrapy functionality
         echo -e "Testing frustrapy functionality..."
         python -c "
 import frustrapy
-print('✓ frustrapy functionality test successful')
+print('[o] frustrapy functionality test successful')
 " || { echo -e "Warning: frustrapy test failed - this may affect some functionality"; }
 
         # Test Bio.PDB import
         echo -e "Testing Bio.PDB.PDBParser import..."
         python -c "
 from Bio.PDB import PDBParser
-print('✓ Bio.PDB.PDBParser import successful')
+print('[o] Bio.PDB.PDBParser import successful')
 " || { echo -e "Warning: Bio.PDB.PDBParser test failed - this may affect some functionality"; }
 
         echo -e "\n=== Environment Test Summary ==="
         python -c "
 import torch
 if torch.cuda.is_available():
-    print('GPU support: ✓ AVAILABLE')
+    print('GPU support: [o] AVAILABLE')
     print(f'CUDA devices detected: {torch.cuda.device_count()}')
 else:
-    print('GPU support: ⚠ NOT AVAILABLE (CPU-only)')
+    print('GPU support: [!] NOT AVAILABLE (CPU-only)')
 "
         
         conda deactivate
-        echo -e "✓ Existing frustraMPNN environment is functional"
+        echo -e "[o] Existing frustraMPNN environment is functional"
         echo -e "Activate environment using command: \"$pkg_manager activate frustraMPNN\""
         exit 0
     fi
@@ -199,9 +190,11 @@ echo -e "frustraMPNN environment activated at ${CONDA_BASE}/envs/frustraMPNN"
 # install required conda packages
 echo -e "Installing conda requirements\n"
 if [ -n "$cuda" ]; then
+    echo -e "Installing PyTorch with CUDA $cuda support..."
     CONDA_OVERRIDE_CUDA="$cuda" $pkg_manager install -y numpy=1.26 pytorch=2.2.2 torchvision torchaudio pytorch-cuda=$cuda -c pytorch -c nvidia || { echo -e "Error: Failed to install PyTorch with CUDA."; exit 1; }
 else
-    $pkg_manager install -y numpy=1.26 pytorch=2.1.2 torchvision torchaudio cpuonly -c pytorch || { echo -e "Error: Failed to install PyTorch CPU-only."; exit 1; }
+    echo -e "Installing PyTorch with automatic hardware detection..."
+    $pkg_manager install -y numpy=1.26 pytorch=2.2.2 torchvision torchaudio pytorch-cuda -c pytorch -c nvidia || { echo -e "Error: Failed to install PyTorch."; exit 1; }
 fi
 
 # Install additional conda packages
@@ -278,7 +271,7 @@ import omegaconf
 import wandb
 import pyrosetta
 import frustrapy
-print('✓ All packages imported successfully')
+print('[o] All packages imported successfully')
 " || { echo -e "Error: Package import test failed"; exit 1; }
 
 # Test PyTorch CUDA availability
@@ -297,21 +290,21 @@ if torch.cuda.is_available():
     x = torch.randn(100, 100).to(device)
     y = torch.randn(100, 100).to(device)
     z = torch.mm(x, y)
-    print('✓ GPU tensor operations working')
+    print('[o] GPU tensor operations working')
 else:
-    print('⚠ CUDA not available - CPU-only installation')
+    print('[!] CUDA not available - CPU-only installation')
     # Test CPU operations
     x = torch.randn(100, 100)
     y = torch.randn(100, 100)
     z = torch.mm(x, y)
-    print('✓ CPU tensor operations working')
+    print('[o] CPU tensor operations working')
 "
 
 # Test ESM model loading
 echo -e "Testing ESM model import..."
 python -c "
 import esm
-print('✓ ESM model import successful')
+print('[o] ESM model import successful')
 " || { echo -e "Warning: ESM model test failed - this may affect some functionality"; }
 
 # Test PyRosetta initialization
@@ -319,21 +312,21 @@ echo -e "Testing PyRosetta initialization..."
 python -c "
 import pyrosetta
 pyrosetta.init('-mute all')
-print('✓ PyRosetta initialization successful')
+print('[o] PyRosetta initialization successful')
 " || { echo -e "Warning: PyRosetta initialization failed - this may affect some functionality"; }
 
 # Test frustrapy functionality
 echo -e "Testing frustrapy functionality..."
 python -c "
 import frustrapy
-print('✓ frustrapy functionality test successful')
+print('[o] frustrapy functionality test successful')
 " || { echo -e "Warning: frustrapy test failed - this may affect some functionality"; }
 
 # Test Bio.PDB import
 echo -e "Testing Bio.PDB.PDBParser import..."
 python -c "
 from Bio.PDB import PDBParser
-print('✓ Bio.PDB.PDBParser import successful')
+print('[o] Bio.PDB.PDBParser import successful')
 " || { echo -e "Warning: Bio.PDB.PDBParser test failed - this may affect some functionality"; }
 
 echo -e "\n=== Installation Test Summary ==="
@@ -346,10 +339,10 @@ fi
 python -c "
 import torch
 if torch.cuda.is_available():
-    print('GPU support: ✓ AVAILABLE')
+    print('GPU support: [o] AVAILABLE')
     print(f'CUDA devices detected: {torch.cuda.device_count()}')
 else:
-    print('GPU support: ⚠ NOT AVAILABLE (CPU-only)')
+    print('GPU support: [!] NOT AVAILABLE (CPU-only)')
 "
 
 # finish

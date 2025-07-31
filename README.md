@@ -1,3 +1,13 @@
+# TODO
+
+- [ ] Find better structure for building docker
+  - [ ] need to copy the correct files
+- [ ] Add details about training and inference
+  - [ ] test scripts for training
+  - [ ] example command docker / singularity / local training
+- [ ] Add script to download datasets
+
+
 # frustraMPNN
 
 ## Installation
