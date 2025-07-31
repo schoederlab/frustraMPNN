@@ -24,8 +24,8 @@ RUN curl -L -o mambaforge.sh https://github.com/conda-forge/miniforge/releases/d
 
 # Copy environment setup (replace this with your own layer-by-layer install to avoid .yml)
 RUN mkdir -p /app
-COPY ../inference /app/inference
-COPY ../scripts /app/scripts
+COPY inference /app/inference
+COPY scripts /app/scripts
 RUN mkdir -p /app/results
 
 # Create env and install everything with mamba

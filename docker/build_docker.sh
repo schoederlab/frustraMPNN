@@ -1,1 +1,1 @@
-docker build -t frustrampnn:v1 .
+docker build -f ./Dockerfile -t frustrampnn:v1 .
