@@ -77,8 +77,8 @@ EOF
     chmod +x /app/entrypoint.sh
 
 %files
-    inference /app/inference
-    scripts /app/scripts
+    ../inference /app/inference
+    ../scripts /app/scripts
 
 %runscript
     exec /app/entrypoint.sh "$@"
