@@ -1,0 +1,45 @@
+project: "thermoMPNN_adapt_weightsTest_weight_sum"
+name: "fireprot_weights_training"
+logger: "wandb"
+
+platform:
+  accel: "gpu"
+  cache_dir: "cache"
+  thermompnn_dir: "./"
+  use_tpu: false
+
+datasets: "fireprot"
+
+data_loc:
+  megascale_csv: "../data_csv_frustra/megascale/megascale_with_frustration_as_ddg.csv"
+  megascale_splits: "../data_csv_frustra/megascale/mut_splits/megascale_splits_0.pkl"
+  megascale_pdbs: "../pdb_files/megascale/AlphaFold_model_PDBs/"
+  fireprot_csv: "../data_csv_frustra/fireprot/full_data_with_frustration_as_ddg_with_weights.csv"
+  fireprot_splits: "../data_csv_frustra/fireprot/mut_splits/fireprot_splits_11.pkl"
+  fireprot_pdbs: "../pdb_files/fireprot/combined"
+  weights_dir: "./weights"
+  torch_hub: "./esm_models"
+  log_dir: "./logs"
+
+training:
+  num_workers: 10
+  learn_rate: 0.001
+  epochs: 100
+  lr_schedule: true
+  mpnn_learn_rate: 0.001
+  two_stage: false
+  testing: true
+  ddp: false
+  add_esm_embeddings: false
+  esm_model: "esm2_t33_650M_UR50D"
+  reweighting: false
+  weight_method: "weight_lds_inverse"
+  seed: 0
+
+model:
+  hidden_dims: [64, 32]
+  subtract_mut: true
+  num_final_layers: 3
+  freeze_weights: true
+  load_pretrained: true
+  lightattn: true
