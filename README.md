@@ -6,6 +6,8 @@
   - [ ] test scripts for training
   - [ ] example command docker / singularity / local training
 - [ ] Add script to download datasets
+- [ ] Add Description what is this repo about
+  - [ ] **ADD DISCLAIMER THAT WE TAKE A LOT OF CODE FROM THERMOMPNN**
 
 
 # frustraMPNN
