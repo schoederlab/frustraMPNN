@@ -2,7 +2,6 @@
 
 import pytest
 
-from frustrampnn.training.config import TrainingConfig
 from frustrampnn.training.lightning import (
     FrustraMPNNCheckpoint,
     TransferModelPL,

@@ -370,7 +370,7 @@ class TestFeatureEdgeCases:
 
     def test_single_residue(self):
         """Test with single residue (edge case).
-        
+
         Note: Single residue is an edge case that may not work with all
         feature extraction methods due to orientation calculations requiring
         multiple residues. This test verifies the behavior.

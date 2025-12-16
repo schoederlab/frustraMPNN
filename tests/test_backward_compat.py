@@ -136,20 +136,6 @@ class TestNewAPIOutputFormat:
 
     def test_new_api_output_columns(self) -> None:
         """Verify new API produces required columns."""
-
-        # Create a mock DataFrame like what FrustraMPNN.predict() returns
-        # This tests the expected output format
-        expected_columns = [
-            "frustration_pred",
-            "position",
-            "wildtype",
-            "mutation",
-            "pdb",
-            "chain",
-        ]
-
-        # The new API should produce these columns
-        # (actual prediction test requires checkpoint)
         from frustrampnn import FrustraMPNN
 
         # Check that the class exists and has predict method

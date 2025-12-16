@@ -63,7 +63,7 @@ esm_models/
 # Temporary test outputs (not test files)
 test_output/
 test_results/
-
+test_data
 ag*
 A*.md
 docs/pl*

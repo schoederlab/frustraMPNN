@@ -118,7 +118,7 @@ class TestMutationGenerationIntegration:
         assert len(mutations) == 60
 
         # Verify only specified positions
-        positions = set(m.position for m in mutations)
+        positions = {m.position for m in mutations}
         assert positions == {0, 5, 10}
 
     def test_mutation_to_dict_integration(self) -> None:
