@@ -60,7 +60,10 @@ lightning_logs/
 # ESM models cache
 esm_models/
 
-test_*
+# Temporary test outputs (not test files)
+test_output/
+test_results/
+
 ag*
 A*.md
 docs/pl*
