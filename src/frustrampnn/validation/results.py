@@ -54,9 +54,7 @@ class PositionComparison:
     @property
     def n_mutations(self) -> int:
         """Number of mutations compared at this position."""
-        common_keys = set(self.frustrampnn_values.keys()) & set(
-            self.frustrapy_values.keys()
-        )
+        common_keys = set(self.frustrampnn_values.keys()) & set(self.frustrapy_values.keys())
         return len(common_keys)
 
     def to_dict(self) -> dict[str, Any]:
@@ -189,8 +187,7 @@ class ComparisonResult:
             import matplotlib.pyplot as plt
         except ImportError as e:
             raise ImportError(
-                "matplotlib is required for plotting. "
-                "Install with: pip install matplotlib"
+                "matplotlib is required for plotting. Install with: pip install matplotlib"
             ) from e
 
         if self.merged_data is None or len(self.merged_data) == 0:
@@ -208,9 +205,7 @@ class ComparisonResult:
         )
 
         # Get axis limits
-        all_values = list(self.merged_data["frustrapy"]) + list(
-            self.merged_data["frustrampnn"]
-        )
+        all_values = list(self.merged_data["frustrapy"]) + list(self.merged_data["frustrampnn"])
         min_val = min(all_values) - 0.5
         max_val = max(all_values) + 0.5
 
@@ -275,8 +270,7 @@ class ComparisonResult:
             import matplotlib.pyplot as plt
         except ImportError as e:
             raise ImportError(
-                "matplotlib is required for plotting. "
-                "Install with: pip install matplotlib"
+                "matplotlib is required for plotting. Install with: pip install matplotlib"
             ) from e
 
         if not self.position_results:

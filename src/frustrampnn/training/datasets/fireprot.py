@@ -96,9 +96,7 @@ class FireProtDataset(BaseDataset):
         # Build seq_to_data mapping (matches original)
         seq_key = "pdb_sequence"
         for wt_seq in df[seq_key].unique():
-            self.seq_to_data[wt_seq] = df.query(f"{seq_key} == @wt_seq").reset_index(
-                drop=True
-            )
+            self.seq_to_data[wt_seq] = df.query(f"{seq_key} == @wt_seq").reset_index(drop=True)
 
         self._df = df
 
@@ -122,8 +120,7 @@ class FireProtDataset(BaseDataset):
         else:
             if self.split not in self._splits:
                 raise ValueError(
-                    f"Split '{self.split}' not found. "
-                    f"Available: {list(self._splits.keys())}"
+                    f"Split '{self.split}' not found. Available: {list(self._splits.keys())}"
                 )
             self.split_wt_names[self.split] = self._splits[self.split]
 
@@ -135,9 +132,7 @@ class FireProtDataset(BaseDataset):
 
         # Group mutations by protein (matches original)
         for wt_name in self.wt_names:
-            self.mut_rows[wt_name] = df.query(
-                "pdb_id_corrected == @wt_name"
-            ).reset_index(drop=True)
+            self.mut_rows[wt_name] = df.query("pdb_id_corrected == @wt_name").reset_index(drop=True)
 
             if self.split == "test":
                 print(f"TEST wt_name: {wt_name}")
@@ -182,25 +177,15 @@ class FireProtDataset(BaseDataset):
         for i, row in data.iterrows():  # noqa: B007
             try:
                 pdb_idx = row.pdb_position
-                assert (
-                    pdb[0]["seq"][pdb_idx]
-                    == row.wild_type
-                    == row.pdb_sequence[row.pdb_position]
-                )
+                assert pdb[0]["seq"][pdb_idx] == row.wild_type == row.pdb_sequence[row.pdb_position]
 
             except AssertionError:  # contingency for mis-alignments
-                align, *rest = pairwise2.align.globalxx(
-                    seq, pdb[0]["seq"].replace("-", "X")
-                )
+                align, *rest = pairwise2.align.globalxx(seq, pdb[0]["seq"].replace("-", "X"))
                 pdb_idx = seq1_index_to_seq2_index(align, row.pdb_position)
                 if pdb_idx is None:
                     continue
 
-                assert (
-                    pdb[0]["seq"][pdb_idx]
-                    == row.wild_type
-                    == row.pdb_sequence[row.pdb_position]
-                )
+                assert pdb[0]["seq"][pdb_idx] == row.wild_type == row.pdb_sequence[row.pdb_position]
 
             # Handle frustration value (matches original)
             frustration = (
@@ -240,4 +225,3 @@ class FireProtDataset(BaseDataset):
     def get_mutation_count(self) -> int:
         """Get total number of mutations across all proteins."""
         return sum(len(self.mut_rows[name]) for name in self.wt_names)
-

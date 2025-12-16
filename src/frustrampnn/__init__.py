@@ -16,7 +16,9 @@ Visualization:
 """
 
 __version__ = "1.0.0"
-__author__ = "Max Beining, Felipe Engelberger, Clara T. Schoeder, César A. Ramírez-Sarmiento, Jens Meiler"
+__author__ = (
+    "Max Beining, Felipe Engelberger, Clara T. Schoeder, César A. Ramírez-Sarmiento, Jens Meiler"
+)
 
 from frustrampnn.constants import (
     AA_1_TO_3,

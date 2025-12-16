@@ -16,7 +16,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Union
 
 from omegaconf import DictConfig, OmegaConf
 
@@ -100,7 +99,7 @@ class TrainingHyperparamsConfig:
     esm_model: str = "esm2_t33_650M_UR50D"
     reweighting: bool = False
     weight_method: str = "weight_lds_inverse"
-    seed: Optional[int] = 0
+    seed: int | None = 0
 
 
 @dataclass
@@ -117,7 +116,7 @@ class ModelArchConfig:
         lightattn: Whether to use LightAttention
     """
 
-    hidden_dims: List[int] = field(default_factory=lambda: [64, 32])
+    hidden_dims: list[int] = field(default_factory=lambda: [64, 32])
     subtract_mut: bool = True
     num_final_layers: int = 3
     freeze_weights: bool = True
@@ -166,9 +165,9 @@ class TrainingConfig:
     @classmethod
     def from_yaml(
         cls,
-        yaml_path: Union[str, Path],
-        overrides: Optional[List[str]] = None,
-    ) -> "TrainingConfig":
+        yaml_path: str | Path,
+        overrides: list[str] | None = None,
+    ) -> TrainingConfig:
         """
         Load configuration from YAML file.
 
@@ -195,7 +194,7 @@ class TrainingConfig:
         return cls.from_dictconfig(cfg)
 
     @classmethod
-    def from_dictconfig(cls, cfg: DictConfig) -> "TrainingConfig":
+    def from_dictconfig(cls, cfg: DictConfig) -> TrainingConfig:
         """
         Create TrainingConfig from OmegaConf DictConfig.
 
@@ -276,7 +275,7 @@ class TrainingConfig:
         """
         return OmegaConf.structured(self)
 
-    def save_yaml(self, path: Union[str, Path]) -> None:
+    def save_yaml(self, path: str | Path) -> None:
         """
         Save configuration to YAML file.
 
@@ -285,4 +284,3 @@ class TrainingConfig:
         """
         cfg = self.to_dictconfig()
         OmegaConf.save(cfg, path)
-

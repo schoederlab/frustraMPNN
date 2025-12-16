@@ -107,9 +107,7 @@ def run_frustrapy_single_residue(
     else:
         os.makedirs(results_dir, exist_ok=True)
 
-    logger.info(
-        f"Running frustrapy single-residue analysis for {len(positions)} positions"
-    )
+    logger.info(f"Running frustrapy single-residue analysis for {len(positions)} positions")
     logger.info(f"Positions: {positions}")
     logger.info(f"Results directory: {results_dir}")
 
@@ -152,9 +150,7 @@ def run_frustrapy_single_residue(
         logger.info(f"frustrapy calculation completed in {elapsed_time:.1f}s")
 
         # Extract results
-        results = extract_single_residue_data(
-            pdb_obj, single_residue_data, chain, positions
-        )
+        results = extract_single_residue_data(pdb_obj, single_residue_data, chain, positions)
 
         return results, elapsed_time
 
@@ -240,8 +236,7 @@ def get_pdb_residue_mapping(
         from Bio.PDB import PDBParser
     except ImportError as e:
         raise ImportError(
-            "BioPython is required for PDB parsing. "
-            "Install with: pip install biopython"
+            "BioPython is required for PDB parsing. Install with: pip install biopython"
         ) from e
 
     parser = PDBParser(QUIET=True)

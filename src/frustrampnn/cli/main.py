@@ -174,8 +174,10 @@ def predict(
 
         # Show summary statistics
         if len(results) > 0:
-            click.echo(f"Frustration range: [{results['frustration_pred'].min():.3f}, "
-                      f"{results['frustration_pred'].max():.3f}]")
+            click.echo(
+                f"Frustration range: [{results['frustration_pred'].min():.3f}, "
+                f"{results['frustration_pred'].max():.3f}]"
+            )
 
 
 @cli.command()
@@ -507,9 +509,7 @@ def evaluate(
             ckpt = torch.load(checkpoint, map_location="cpu")
             cfg_data = ckpt.get("cfg")
             if cfg_data is None:
-                raise click.ClickException(
-                    "No config found in checkpoint. Please provide --config"
-                )
+                raise click.ClickException("No config found in checkpoint. Please provide --config")
             cfg = TrainingConfig.from_dictconfig(cfg_data)
         except click.ClickException:
             raise
@@ -562,4 +562,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

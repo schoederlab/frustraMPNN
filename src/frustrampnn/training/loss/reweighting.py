@@ -18,7 +18,7 @@ Backup: test_data/training/train_thermompnn_refac.py.bak
 
 from __future__ import annotations
 
-from typing import Callable, List, Optional
+from collections.abc import Callable
 
 import numpy as np
 
@@ -168,18 +168,12 @@ def get_weight_method(method_name: str) -> Callable[[np.ndarray], np.ndarray]:
     methods = {
         "weight_bin_inverse": lambda v: compute_bin_weights(v, method="inverse"),
         "weight_lds_inverse": lambda v: compute_lds_weights(v, method="inverse"),
-        "weight_bin_inverse_sqrt": lambda v: compute_bin_weights(
-            v, method="inverse_sqrt"
-        ),
-        "weight_lds_inverse_sqrt": lambda v: compute_lds_weights(
-            v, method="inverse_sqrt"
-        ),
+        "weight_bin_inverse_sqrt": lambda v: compute_bin_weights(v, method="inverse_sqrt"),
+        "weight_lds_inverse_sqrt": lambda v: compute_lds_weights(v, method="inverse_sqrt"),
     }
 
     if method_name not in methods:
-        raise ValueError(
-            f"Unknown weight method: {method_name}. " f"Available: {list(methods.keys())}"
-        )
+        raise ValueError(f"Unknown weight method: {method_name}. Available: {list(methods.keys())}")
 
     return methods[method_name]
 
@@ -228,10 +222,7 @@ class SampleReweighter:
             sigma: LDS kernel sigma (for LDS methods)
         """
         if method not in VALID_WEIGHT_METHODS:
-            raise ValueError(
-                f"Unknown weight method: {method}. "
-                f"Available: {VALID_WEIGHT_METHODS}"
-            )
+            raise ValueError(f"Unknown weight method: {method}. Available: {VALID_WEIGHT_METHODS}")
 
         self.method = method
         self.num_bins = num_bins
@@ -310,4 +301,3 @@ __all__ = [
     "VALID_WEIGHT_METHODS",
     "validate_weight_method",
 ]
-

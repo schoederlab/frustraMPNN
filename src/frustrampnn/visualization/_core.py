@@ -126,10 +126,6 @@ def prepare_single_residue_data(
     df = df.sort_values("aa_order")
 
     # Add colors
-    df["color"] = df.apply(
-        lambda row: get_color_for_row(row, wildtype, frustration_col), axis=1
-    )
+    df["color"] = df.apply(lambda row: get_color_for_row(row, wildtype, frustration_col), axis=1)
 
     return df, wildtype
-
-

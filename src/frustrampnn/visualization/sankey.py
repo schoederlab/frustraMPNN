@@ -33,15 +33,15 @@ logger = logging.getLogger(__name__)
 # Sankey color scheme matching the manuscript
 SANKEY_COLORS = {
     "minimally": "rgba(144, 238, 144, 0.8)",  # Light green with transparency
-    "neutral": "rgba(211, 211, 211, 0.8)",    # Light gray with transparency
-    "highly": "rgba(255, 182, 193, 0.8)",     # Light red/pink with transparency
+    "neutral": "rgba(211, 211, 211, 0.8)",  # Light gray with transparency
+    "highly": "rgba(255, 182, 193, 0.8)",  # Light red/pink with transparency
 }
 
 # Node colors (solid)
 NODE_COLORS = {
     "minimally": "#90EE90",  # Light green
-    "neutral": "#D3D3D3",    # Light gray
-    "highly": "#FFB6C1",     # Light red/pink
+    "neutral": "#D3D3D3",  # Light gray
+    "highly": "#FFB6C1",  # Light red/pink
 }
 
 
@@ -90,10 +90,12 @@ def compute_category_flows(
     flows = {}
     for calc_cat in ["minimally", "neutral", "highly"]:
         for pred_cat in ["minimally", "neutral", "highly"]:
-            count = len(merged[
-                (merged[f"{category_col}_calc"] == calc_cat) &
-                (merged[f"{category_col}_pred"] == pred_cat)
-            ])
+            count = len(
+                merged[
+                    (merged[f"{category_col}_calc"] == calc_cat)
+                    & (merged[f"{category_col}_pred"] == pred_cat)
+                ]
+            )
             if count > 0:
                 flows[(calc_cat, pred_cat)] = count
 
@@ -184,23 +186,27 @@ def plot_frustration_sankey(
         link_colors.append(SANKEY_COLORS[calc_cat])
 
     # Create Sankey diagram
-    fig = go.Figure(data=[go.Sankey(
-        node=dict(
-            pad=15,
-            thickness=20,
-            line=dict(color="black", width=0.5),
-            label=node_labels,
-            color=node_colors,
-            x=[0.01, 0.01, 0.01, 0.99, 0.99, 0.99],  # Left and right positions
-            y=[0.1, 0.5, 0.9, 0.1, 0.5, 0.9],  # Vertical positions
-        ),
-        link=dict(
-            source=source,
-            target=target,
-            value=value,
-            color=link_colors,
-        ),
-    )])
+    fig = go.Figure(
+        data=[
+            go.Sankey(
+                node=dict(
+                    pad=15,
+                    thickness=20,
+                    line=dict(color="black", width=0.5),
+                    label=node_labels,
+                    color=node_colors,
+                    x=[0.01, 0.01, 0.01, 0.99, 0.99, 0.99],  # Left and right positions
+                    y=[0.1, 0.5, 0.9, 0.1, 0.5, 0.9],  # Vertical positions
+                ),
+                link=dict(
+                    source=source,
+                    target=target,
+                    value=value,
+                    color=link_colors,
+                ),
+            )
+        ]
+    )
 
     # Update layout
     if title is None:
@@ -305,8 +311,9 @@ def plot_frustration_sankey_matplotlib(
         calc_height = calc_counts.get(cat, 0) / total * 0.7
         left_y = y_offset - calc_height / 2
         rect = plt.Rectangle(
-            (left_x - bar_width/2, left_y - calc_height/2),
-            bar_width, calc_height,
+            (left_x - bar_width / 2, left_y - calc_height / 2),
+            bar_width,
+            calc_height,
             facecolor=NODE_COLORS[cat],
             edgecolor="black",
             linewidth=0.5,
@@ -315,16 +322,18 @@ def plot_frustration_sankey_matplotlib(
         left_positions[cat] = (left_x, left_y)
 
         # Label
-        label = f"{cat.capitalize()}\n{calc_counts.get(cat, 0)}" if show_counts else cat.capitalize()
-        ax.text(left_x - bar_width/2 - 0.02, left_y, label,
-                ha="right", va="center", fontsize=9)
+        label = (
+            f"{cat.capitalize()}\n{calc_counts.get(cat, 0)}" if show_counts else cat.capitalize()
+        )
+        ax.text(left_x - bar_width / 2 - 0.02, left_y, label, ha="right", va="center", fontsize=9)
 
         # Right bar (predicted)
         pred_height = pred_counts.get(cat, 0) / total * 0.7
         right_y = y_offset - pred_height / 2
         rect = plt.Rectangle(
-            (right_x - bar_width/2, right_y - pred_height/2),
-            bar_width, pred_height,
+            (right_x - bar_width / 2, right_y - pred_height / 2),
+            bar_width,
+            pred_height,
             facecolor=NODE_COLORS[cat],
             edgecolor="black",
             linewidth=0.5,
@@ -333,9 +342,10 @@ def plot_frustration_sankey_matplotlib(
         right_positions[cat] = (right_x, right_y)
 
         # Label
-        label = f"{cat.capitalize()}\n{pred_counts.get(cat, 0)}" if show_counts else cat.capitalize()
-        ax.text(right_x + bar_width/2 + 0.02, right_y, label,
-                ha="left", va="center", fontsize=9)
+        label = (
+            f"{cat.capitalize()}\n{pred_counts.get(cat, 0)}" if show_counts else cat.capitalize()
+        )
+        ax.text(right_x + bar_width / 2 + 0.02, right_y, label, ha="left", va="center", fontsize=9)
 
         y_offset -= 0.3
 
@@ -356,10 +366,10 @@ def plot_frustration_sankey_matplotlib(
             mid_x = (left_pos[0] + right_pos[0]) / 2
 
             verts = [
-                (left_pos[0] + bar_width/2, left_pos[1]),
+                (left_pos[0] + bar_width / 2, left_pos[1]),
                 (mid_x, left_pos[1]),
                 (mid_x, right_pos[1]),
-                (right_pos[0] - bar_width/2, right_pos[1]),
+                (right_pos[0] - bar_width / 2, right_pos[1]),
             ]
             codes = [Path.MOVETO, Path.CURVE4, Path.CURVE4, Path.CURVE4]
             path = Path(verts, codes)
@@ -390,4 +400,3 @@ def plot_frustration_sankey_matplotlib(
 
     plt.tight_layout()
     return fig
-

@@ -43,5 +43,3 @@ __all__ = [
     "plot_frustration_heatmap_plotly",
     "classify_frustration",
 ]
-
-

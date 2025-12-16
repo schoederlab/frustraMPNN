@@ -11,7 +11,7 @@ Backup: test_data/training/train_thermompnn_refac.py.bak
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 try:
     import pytorch_lightning as pl
@@ -57,8 +57,8 @@ if HAS_LIGHTNING:
 
         def __init__(
             self,
-            dirpath: Optional[str] = None,
-            filename: Optional[str] = None,
+            dirpath: str | None = None,
+            filename: str | None = None,
             monitor: str = "val_frustration_spearman",
             mode: str = "max",
             save_top_k: int = 3,
@@ -92,9 +92,9 @@ if HAS_LIGHTNING:
 
         def on_save_checkpoint(
             self,
-            trainer: "pl.Trainer",
-            pl_module: "pl.LightningModule",
-            checkpoint: Dict[str, Any],
+            trainer: pl.Trainer,
+            pl_module: pl.LightningModule,
+            checkpoint: dict[str, Any],
         ) -> None:
             """
             Add custom metadata to checkpoint.
@@ -127,7 +127,7 @@ else:
 def load_checkpoint_safe(
     checkpoint_path: str,
     map_location: str = "cpu",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Safely load a checkpoint with error handling.
 
@@ -169,7 +169,7 @@ def get_checkpoint_callback(
     weights_dir: str,
     monitor: str = "val_frustration_spearman",
     mode: str = "max",
-) -> "FrustraMPNNCheckpoint":
+) -> FrustraMPNNCheckpoint:
     """
     Create a checkpoint callback with standard settings.
 
@@ -203,5 +203,3 @@ __all__ = [
     "load_checkpoint_safe",
     "get_checkpoint_callback",
 ]
-
-

@@ -10,7 +10,7 @@ Backup: test_data/training/train_thermompnn_refac.py.bak
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any
 
 import torch
 import torch.nn as nn
@@ -31,10 +31,9 @@ if TYPE_CHECKING:
     from omegaconf import DictConfig
 
     from frustrampnn.training.config import TrainingConfig
-    from frustrampnn.training.datasets.base import TrainingMutation
 
 
-def get_metrics() -> Dict[str, Any]:
+def get_metrics() -> dict[str, Any]:
     """
     Create a dictionary of metrics for training.
 
@@ -90,7 +89,7 @@ if HAS_LIGHTNING:
 
         def __init__(
             self,
-            cfg: Union["TrainingConfig", "DictConfig"],
+            cfg: TrainingConfig | DictConfig,
         ) -> None:
             """
             Initialize TransferModelPL.
@@ -112,13 +111,9 @@ if HAS_LIGHTNING:
             # Training parameters - match original exactly
             self.learn_rate = cfg.training.learn_rate
             self.mpnn_learn_rate = (
-                cfg.training.mpnn_learn_rate
-                if "mpnn_learn_rate" in cfg.training
-                else None
+                cfg.training.mpnn_learn_rate if "mpnn_learn_rate" in cfg.training else None
             )
-            self.lr_schedule = (
-                cfg.training.lr_schedule if "lr_schedule" in cfg.training else False
-            )
+            self.lr_schedule = cfg.training.lr_schedule if "lr_schedule" in cfg.training else False
 
             # Set up metrics dictionary - match original exactly (lines 73-80)
             self.metrics = nn.ModuleDict()
@@ -149,10 +144,10 @@ if HAS_LIGHTNING:
 
         def shared_eval(
             self,
-            batch: List[Tuple],
+            batch: list[tuple],
             batch_idx: int,
             prefix: str,
-        ) -> Optional[torch.Tensor]:
+        ) -> torch.Tensor | None:
             """
             Shared evaluation logic for train/val/test.
 
@@ -177,7 +172,7 @@ if HAS_LIGHTNING:
                 # Calculate weight sum for normalization - match original line 97
                 weight_sum = sum([mut.weight for mut in mutations])
 
-            for mut, out in zip(mutations, pred):
+            for mut, out in zip(mutations, pred, strict=False):
                 if mut.frustration is not None:
                     # Reweight loss if specified - match original lines 102-108
                     if self.reweighting_loss:
@@ -189,15 +184,11 @@ if HAS_LIGHTNING:
 
                     frustration_mses.append(loss)
                     # Update metrics - match original lines 111-112
-                    for metric in self.metrics[f"{prefix}_metrics"][
-                        "frustration"
-                    ].values():
+                    for metric in self.metrics[f"{prefix}_metrics"]["frustration"].values():
                         metric.update(out["frustration"], mut.frustration)
 
             # Compute mean loss - match original line 115
-            loss = (
-                0.0 if len(frustration_mses) == 0 else torch.stack(frustration_mses).mean()
-            )
+            loss = 0.0 if len(frustration_mses) == 0 else torch.stack(frustration_mses).mean()
             on_step = False
             on_epoch = not on_step
 
@@ -225,9 +216,9 @@ if HAS_LIGHTNING:
 
         def training_step(
             self,
-            batch: List[Tuple],
+            batch: list[tuple],
             batch_idx: int,
-        ) -> Optional[torch.Tensor]:
+        ) -> torch.Tensor | None:
             """
             Training step.
 
@@ -244,9 +235,9 @@ if HAS_LIGHTNING:
 
         def validation_step(
             self,
-            batch: List[Tuple],
+            batch: list[tuple],
             batch_idx: int,
-        ) -> Optional[torch.Tensor]:
+        ) -> torch.Tensor | None:
             """
             Validation step.
 
@@ -263,9 +254,9 @@ if HAS_LIGHTNING:
 
         def test_step(
             self,
-            batch: List[Tuple],
+            batch: list[tuple],
             batch_idx: int,
-        ) -> Optional[torch.Tensor]:
+        ) -> torch.Tensor | None:
             """
             Test step.
 
@@ -280,7 +271,7 @@ if HAS_LIGHTNING:
             """
             return self.shared_eval(batch, batch_idx, "test")
 
-        def configure_optimizers(self) -> Union[torch.optim.Optimizer, Dict]:
+        def configure_optimizers(self) -> torch.optim.Optimizer | dict:
             """
             Configure optimizers and schedulers.
 
@@ -313,13 +304,9 @@ if HAS_LIGHTNING:
                         {"params": self.model.light_attention.parameters(), "lr": 0.0}
                     )
                 else:
-                    param_list.append(
-                        {"params": self.model.light_attention_mpnn.parameters()}
-                    )
+                    param_list.append({"params": self.model.light_attention_mpnn.parameters()})
                     if self.cfg.training.add_esm_embeddings:
-                        param_list.append(
-                            {"params": self.model.light_attention_esm.parameters()}
-                        )
+                        param_list.append({"params": self.model.light_attention_esm.parameters()})
 
             # MLP parameters - match original lines 163-166
             mlp_params = [
@@ -345,7 +332,7 @@ if HAS_LIGHTNING:
             else:
                 return opt
 
-        def on_save_checkpoint(self, checkpoint: Dict) -> None:
+        def on_save_checkpoint(self, checkpoint: dict) -> None:
             """
             Customize checkpoint saving.
 
@@ -360,12 +347,11 @@ if HAS_LIGHTNING:
             checkpoint["state_dict"] = {
                 k: v
                 for k, v in self.state_dict().items()
-                if k in dict(self.named_parameters())
-                and self.get_parameter(k).requires_grad
+                if k in dict(self.named_parameters()) and self.get_parameter(k).requires_grad
             }
             checkpoint["cfg"] = self.cfg
 
-        def on_load_checkpoint(self, checkpoint: Dict) -> None:
+        def on_load_checkpoint(self, checkpoint: dict) -> None:
             """
             Customize checkpoint loading.
 
@@ -404,5 +390,3 @@ __all__ = [
     "TransferModelPL",
     "get_metrics",
 ]
-
-

@@ -57,14 +57,16 @@ def sample_frustration_df() -> pd.DataFrame:
         for aa in "ACDEFGHIKLMNPQRSTVWY":
             # Create mock frustration values
             value = np.sin(pos * 0.5) + (ord(aa) - 77) / 20
-            data.append({
-                "frustration_pred": value,
-                "position": pos,
-                "wildtype": wt,
-                "mutation": aa,
-                "pdb": "test",
-                "chain": "A",
-            })
+            data.append(
+                {
+                    "frustration_pred": value,
+                    "position": pos,
+                    "wildtype": wt,
+                    "mutation": aa,
+                    "pdb": "test",
+                    "chain": "A",
+                }
+            )
     return pd.DataFrame(data)
 
 
@@ -219,6 +221,7 @@ def cleanup_matplotlib():
     yield
     try:
         import matplotlib.pyplot as plt
+
         plt.close("all")
     except ImportError:
         pass
@@ -242,15 +245,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
     )
-    config.addinivalue_line(
-        "markers", "gpu: marks tests that require GPU"
-    )
-    config.addinivalue_line(
-        "markers", "integration: marks integration tests"
-    )
-    config.addinivalue_line(
-        "markers", "regression: marks regression tests"
-    )
+    config.addinivalue_line("markers", "gpu: marks tests that require GPU")
+    config.addinivalue_line("markers", "integration: marks integration tests")
+    config.addinivalue_line("markers", "regression: marks regression tests")
 
 
 @pytest.fixture
@@ -266,4 +263,3 @@ def skip_if_no_checkpoint(test_data_dir: Path):
     checkpoint_dir = Path("inference/vanilla_model_weights")
     if not checkpoint_dir.exists() or not list(checkpoint_dir.glob("*.pt")):
         pytest.skip("Model checkpoint not available")
-

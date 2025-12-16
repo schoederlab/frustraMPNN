@@ -78,4 +78,3 @@ __all__ = [
     "plot_frustration_sankey_matplotlib",
     "compute_category_flows",
 ]
-

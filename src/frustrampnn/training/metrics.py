@@ -10,14 +10,12 @@ Backup: test_data/training/train_thermompnn_refac.py.bak
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
-
 import torch
 from torchmetrics import MeanSquaredError, Metric, SpearmanCorrCoef
 from torchmetrics.regression import R2Score
 
 
-def get_metrics() -> Dict[str, Metric]:
+def get_metrics() -> dict[str, Metric]:
     """
     Create a dictionary of metrics for training.
 
@@ -41,9 +39,9 @@ def get_metrics() -> Dict[str, Metric]:
 
 
 def create_metric_dict(
-    prefixes: Optional[List[str]] = None,
-    tasks: Optional[List[str]] = None,
-) -> Dict[str, Dict[str, Dict[str, Metric]]]:
+    prefixes: list[str] | None = None,
+    tasks: list[str] | None = None,
+) -> dict[str, dict[str, dict[str, Metric]]]:
     """
     Create nested metric dictionary for multiple splits and tasks.
 
@@ -66,7 +64,7 @@ def create_metric_dict(
     if tasks is None:
         tasks = ["frustration"]
 
-    result: Dict[str, Dict[str, Dict[str, Metric]]] = {}
+    result: dict[str, dict[str, dict[str, Metric]]] = {}
     for prefix in prefixes:
         result[f"{prefix}_metrics"] = {}
         for task in tasks:
@@ -78,7 +76,7 @@ def create_metric_dict(
 def compute_all_metrics(
     predictions: torch.Tensor,
     targets: torch.Tensor,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute all metrics for a batch of predictions.
 
@@ -94,7 +92,7 @@ def compute_all_metrics(
         >>> print(f"R²: {results['r2']:.3f}")
     """
     metrics = get_metrics()
-    results: Dict[str, float] = {}
+    results: dict[str, float] = {}
 
     for name, metric in metrics.items():
         metric.update(predictions, targets)
@@ -105,9 +103,9 @@ def compute_all_metrics(
 
 
 def aggregate_epoch_metrics(
-    all_predictions: List[torch.Tensor],
-    all_targets: List[torch.Tensor],
-) -> Dict[str, float]:
+    all_predictions: list[torch.Tensor],
+    all_targets: list[torch.Tensor],
+) -> dict[str, float]:
     """
     Aggregate metrics over an entire epoch.
 
@@ -150,8 +148,8 @@ class MetricTracker:
 
     def __init__(
         self,
-        prefixes: Optional[List[str]] = None,
-        tasks: Optional[List[str]] = None,
+        prefixes: list[str] | None = None,
+        tasks: list[str] | None = None,
     ) -> None:
         """
         Initialize MetricTracker.
@@ -182,7 +180,7 @@ class MetricTracker:
         for metric in metrics.values():
             metric.update(predictions, targets)
 
-    def compute(self, prefix: str, task: str) -> Dict[str, float]:
+    def compute(self, prefix: str, task: str) -> dict[str, float]:
         """
         Compute current metric values.
 
@@ -215,7 +213,7 @@ class MetricTracker:
                 for metric in task_metrics.values():
                     metric.reset()
 
-    def to(self, device: torch.device) -> "MetricTracker":
+    def to(self, device: torch.device) -> MetricTracker:
         """
         Move all metrics to a device.
 
@@ -239,5 +237,3 @@ __all__ = [
     "aggregate_epoch_metrics",
     "MetricTracker",
 ]
-
-

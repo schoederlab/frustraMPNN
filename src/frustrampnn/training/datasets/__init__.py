@@ -43,4 +43,3 @@ __all__ = [
     "seq1_index_to_seq2_index",
     "align_sequences",
 ]
-

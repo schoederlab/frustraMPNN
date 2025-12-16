@@ -11,7 +11,8 @@ import torch.nn.functional as F
 
 try:
     import pytorch_lightning as pl
-    from torchmetrics import MeanSquaredError, R2Score, SpearmanCorrCoef
+    from torchmetrics import MeanSquaredError, R2Score, SpearmanCorrCoef  # noqa: F401
+
     HAS_LIGHTNING = True
 except ImportError:
     HAS_LIGHTNING = False
@@ -35,8 +36,14 @@ class LightAttention(nn.Module):
     https://github.com/HannesStark/protein-localization/blob/master/models/light_attention.py
     """
 
-    def __init__(self, embeddings_dim=1024, output_dim=11, dropout=0.25,
-                 kernel_size=9, conv_dropout: float = 0.25):
+    def __init__(
+        self,
+        embeddings_dim=1024,
+        output_dim=11,
+        dropout=0.25,
+        kernel_size=9,
+        conv_dropout: float = 0.25,
+    ):
         """Initialize LightAttention.
 
         Args:
@@ -46,15 +53,13 @@ class LightAttention(nn.Module):
             kernel_size: Convolution kernel size
             conv_dropout: Convolution dropout rate
         """
-        super(LightAttention, self).__init__()
+        super().__init__()
 
         self.feature_convolution = nn.Conv1d(
-            embeddings_dim, embeddings_dim, kernel_size, stride=1,
-            padding=kernel_size // 2
+            embeddings_dim, embeddings_dim, kernel_size, stride=1, padding=kernel_size // 2
         )
         self.attention_convolution = nn.Conv1d(
-            embeddings_dim, embeddings_dim, kernel_size, stride=1,
-            padding=kernel_size // 2
+            embeddings_dim, embeddings_dim, kernel_size, stride=1, padding=kernel_size // 2
         )
 
         self.softmax = nn.Softmax(dim=-1)
@@ -93,10 +98,10 @@ class TransferModel(nn.Module):
         self.hidden_dims = list(cfg.model.hidden_dims)
         self.subtract_mut = cfg.model.subtract_mut
         self.num_final_layers = cfg.model.num_final_layers
-        self.lightattn = cfg.model.lightattn if 'lightattn' in cfg.model else False
+        self.lightattn = cfg.model.lightattn if "lightattn" in cfg.model else False
 
-        if 'decoding_order' not in self.cfg:
-            self.cfg.decoding_order = 'left-to-right'
+        if "decoding_order" not in self.cfg:
+            self.cfg.decoding_order = "left-to-right"
 
         self.prot_mpnn = get_protein_mpnn(cfg)
         EMBED_DIM = 128
@@ -135,19 +140,17 @@ class TransferModel(nn.Module):
             )
 
         if cfg.training.add_esm_embeddings:
-            self.light_attention_esm = LightAttention(
-                embeddings_dim=self.embed_dim
-            )
+            self.light_attention_esm = LightAttention(embeddings_dim=self.embed_dim)
 
         self.both_out = nn.Sequential()
-        for sz1, sz2 in zip(hid_sizes, hid_sizes[1:]):
+        for sz1, sz2 in zip(hid_sizes, hid_sizes[1:], strict=False):
             self.both_out.append(nn.ReLU())
             self.both_out.append(nn.Linear(sz1, sz2))
 
         self.frustration_out = nn.Linear(1, 1)
 
         alpha_1 = list("ACDEFGHIKLMNPQRSTVWYX")
-        self.aa_N_1 = {n: a for n, a in enumerate(alpha_1)}
+        self.aa_N_1 = dict(enumerate(alpha_1))
 
     def _N_to_AA(self, x):
         """Convert numeric sequence to amino acid string."""
@@ -164,16 +167,14 @@ class TransferModel(nn.Module):
         Returns:
             ESM embeddings tensor
         """
-        data = [
-            (f'seq_{i}', self._N_to_AA(s)[0]) for i, s in enumerate(S)
-        ]
+        data = [(f"seq_{i}", self._N_to_AA(s)[0]) for i, s in enumerate(S)]
         _, _, toks = self.batch_converter(data)
         toks = toks.to(next(self.parameters()).device)
 
         with torch.no_grad():
             results = self.esm_model(toks, repr_layers=[self.esm_layers], return_contacts=False)
 
-        return results['representations'][self.esm_layers]
+        return results["representations"][self.esm_layers]
 
     def forward(self, pdb, mutations, tied_feat=True):
         """Forward pass.
@@ -188,20 +189,35 @@ class TransferModel(nn.Module):
         """
         device = next(self.parameters()).device
 
-        (X, S, mask, lengths, chain_M, chain_encoding_all, chain_list_list,
-         visible_list_list, masked_list_list, masked_chain_length_list_list,
-         chain_M_pos, omit_AA_mask, residue_idx, dihedral_mask,
-         tied_pos_list_of_lists_list, pssm_coef, pssm_bias, pssm_log_odds_all,
-         bias_by_res_all, tied_beta) = tied_featurize(
-            [pdb[0]], device, None, None, None, None, None, None, ca_only=False
-        )
+        (
+            X,
+            S,
+            mask,
+            lengths,
+            chain_M,
+            chain_encoding_all,
+            chain_list_list,
+            visible_list_list,
+            masked_list_list,
+            masked_chain_length_list_list,
+            chain_M_pos,
+            omit_AA_mask,
+            residue_idx,
+            dihedral_mask,
+            tied_pos_list_of_lists_list,
+            pssm_coef,
+            pssm_bias,
+            pssm_log_odds_all,
+            bias_by_res_all,
+            tied_beta,
+        ) = tied_featurize([pdb[0]], device, None, None, None, None, None, None, ca_only=False)
 
         # getting ProteinMPNN structure embeddings
         all_mpnn_hid, mpnn_embed, _ = self.prot_mpnn(
             X, S, mask, chain_M, residue_idx, chain_encoding_all, None
         )
         if self.num_final_layers > 0:
-            mpnn_hid = torch.cat(all_mpnn_hid[:self.num_final_layers], -1)
+            mpnn_hid = torch.cat(all_mpnn_hid[: self.num_final_layers], -1)
 
         # Get full sequence esm embeddings
         if self.esm_attention:
@@ -246,15 +262,18 @@ class TransferModel(nn.Module):
             else:
                 frustration = frustration_out[aa_index][0]
 
-            out.append({
-                "frustration": torch.unsqueeze(frustration, 0),
-            })
+            out.append(
+                {
+                    "frustration": torch.unsqueeze(frustration, 0),
+                }
+            )
 
         return out, None
 
 
 # Only define TransferModelPL if pytorch_lightning is available
 if HAS_LIGHTNING:
+
     class TransferModelPL(pl.LightningModule):
         """PyTorch Lightning wrapper for TransferModel."""
 
@@ -271,8 +290,10 @@ if HAS_LIGHTNING:
             self.model = TransferModel(cfg)
 
             self.learn_rate = cfg.training.learn_rate
-            self.mpnn_learn_rate = cfg.training.mpnn_learn_rate if 'mpnn_learn_rate' in cfg.training else None
-            self.lr_schedule = cfg.training.lr_schedule if 'lr_schedule' in cfg.training else False
+            self.mpnn_learn_rate = (
+                cfg.training.mpnn_learn_rate if "mpnn_learn_rate" in cfg.training else None
+            )
+            self.lr_schedule = cfg.training.lr_schedule if "lr_schedule" in cfg.training else False
 
             # set up metrics dictionary
             self.metrics = nn.ModuleDict()
@@ -298,7 +319,7 @@ if HAS_LIGHTNING:
             if self.reweighting_loss:
                 weight_sum = sum([mut.weight for mut in mutations])
 
-            for mut, out in zip(mutations, pred):
+            for mut, out in zip(mutations, pred, strict=False):
                 if mut.frustration is not None:
                     if self.reweighting_loss:
                         weight = mut.weight
@@ -321,8 +342,14 @@ if HAS_LIGHTNING:
                     metric.compute()
                 except ValueError:
                     continue
-                self.log(f"{prefix}_{output}_{name}", metric, prog_bar=True,
-                         on_step=on_step, on_epoch=on_epoch, batch_size=len(batch))
+                self.log(
+                    f"{prefix}_{output}_{name}",
+                    metric,
+                    prog_bar=True,
+                    on_step=on_step,
+                    on_epoch=on_epoch,
+                    batch_size=len(batch),
+                )
 
             if loss == 0.0:
                 return None
@@ -330,29 +357,30 @@ if HAS_LIGHTNING:
             return loss
 
         def training_step(self, batch, batch_idx):
-            return self.shared_eval(batch, batch_idx, 'train')
+            return self.shared_eval(batch, batch_idx, "train")
 
         def validation_step(self, batch, batch_idx):
-            return self.shared_eval(batch, batch_idx, 'val')
+            return self.shared_eval(batch, batch_idx, "val")
 
         def test_step(self, batch, batch_idx):
-            return self.shared_eval(batch, batch_idx, 'test')
+            return self.shared_eval(batch, batch_idx, "test")
 
         def configure_optimizers(self):
             if self.stage == 2:
-                self.learn_rate /= 10.
+                self.learn_rate /= 10.0
 
             if not self.cfg.model.freeze_weights:
                 param_list = [
-                    {"params": self.model.prot_mpnn.parameters(),
-                     "lr": self.mpnn_learn_rate}
+                    {"params": self.model.prot_mpnn.parameters(), "lr": self.mpnn_learn_rate}
                 ]
             else:
                 param_list = []
 
             if self.model.lightattn:
                 if self.stage == 2:
-                    param_list.append({"params": self.model.light_attention.parameters(), "lr": 0.})
+                    param_list.append(
+                        {"params": self.model.light_attention.parameters(), "lr": 0.0}
+                    )
                 else:
                     param_list.append({"params": self.model.light_attention_mpnn.parameters()})
                     if self.cfg.training.add_esm_embeddings:
@@ -360,7 +388,7 @@ if HAS_LIGHTNING:
 
             mlp_params = [
                 {"params": self.model.both_out.parameters()},
-                {"params": self.model.frustration_out.parameters()}
+                {"params": self.model.frustration_out.parameters()},
             ]
 
             param_list = param_list + mlp_params
@@ -368,30 +396,31 @@ if HAS_LIGHTNING:
 
             if self.lr_schedule:
                 lr_sched = torch.optim.lr_scheduler.ReduceLROnPlateau(
-                    optimizer=opt, verbose=True, mode='min', factor=0.5
+                    optimizer=opt, verbose=True, mode="min", factor=0.5
                 )
                 return {
-                    'optimizer': opt,
-                    'lr_scheduler': lr_sched,
-                    'monitor': 'val_frustration_mse'
+                    "optimizer": opt,
+                    "lr_scheduler": lr_sched,
+                    "monitor": "val_frustration_mse",
                 }
             else:
                 return opt
 
         def on_save_checkpoint(self, checkpoint):
-            checkpoint['state_dict'] = {
-                k: v for k, v in self.state_dict().items()
+            checkpoint["state_dict"] = {
+                k: v
+                for k, v in self.state_dict().items()
                 if k in dict(self.named_parameters()) and self.get_parameter(k).requires_grad
             }
 
         def on_load_checkpoint(self, checkpoint):
-            state_dict_checkpoint = set(checkpoint['state_dict'].keys())
+            state_dict_checkpoint = set(checkpoint["state_dict"].keys())
             state_dict_model = set(self.state_dict().keys())
             missing_keys = state_dict_model - state_dict_checkpoint
 
             if missing_keys:
                 for key in missing_keys:
-                    checkpoint['state_dict'][key] = self.state_dict()[key]
+                    checkpoint["state_dict"][key] = self.state_dict()[key]
 else:
     # Placeholder if pytorch_lightning is not available
     class TransferModelPL:
@@ -402,5 +431,3 @@ else:
                 "TransferModelPL requires pytorch_lightning. "
                 "Install with: pip install pytorch-lightning"
             )
-
-

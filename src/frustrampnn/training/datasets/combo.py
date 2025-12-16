@@ -118,4 +118,3 @@ class ComboDataset(Dataset):
             if hasattr(ds, "get_mutation_count"):
                 total += ds.get_mutation_count()
         return total
-

@@ -110,7 +110,12 @@ ignore = [
     "E501",   # line too long (handled by formatter)
     "B008",   # do not perform function calls in argument defaults
     "C408",   # unnecessary dict() call - common in plotly code
+    "E741",   # ambiguous variable name (O, l) - common in scientific code
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"notebooks/*.ipynb" = ["E402"]  # imports not at top of cell - expected in notebooks
+"scripts/analysis/*.py" = ["F403", "F405", "E701"]  # star imports for pyrosetta, one-line statements
 
 [tool.ruff.lint.isort]
 known-first-party = ["frustrampnn"]

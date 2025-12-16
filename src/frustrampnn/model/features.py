@@ -24,8 +24,16 @@ __all__ = [
 class CA_ProteinFeatures(nn.Module):
     """Extract protein features from CA-only coordinates."""
 
-    def __init__(self, edge_features, node_features, num_positional_embeddings=16,
-                 num_rbf=16, top_k=30, augment_eps=0., num_chain_embeddings=16):
+    def __init__(
+        self,
+        edge_features,
+        node_features,
+        num_positional_embeddings=16,
+        num_rbf=16,
+        top_k=30,
+        augment_eps=0.0,
+        num_chain_embeddings=16,
+    ):
         """Initialize CA protein features.
 
         Args:
@@ -37,7 +45,7 @@ class CA_ProteinFeatures(nn.Module):
             augment_eps: Noise augmentation epsilon
             num_chain_embeddings: Number of chain embeddings
         """
-        super(CA_ProteinFeatures, self).__init__()
+        super().__init__()
         self.edge_features = edge_features
         self.node_features = node_features
         self.top_k = top_k
@@ -65,20 +73,19 @@ class CA_ProteinFeatures(nn.Module):
         """
         diag = torch.diagonal(R, dim1=-2, dim2=-1)
         Rxx, Ryy, Rzz = diag.unbind(-1)
-        magnitudes = 0.5 * torch.sqrt(torch.abs(1 + torch.stack([
-            Rxx - Ryy - Rzz,
-            - Rxx + Ryy - Rzz,
-            - Rxx - Ryy + Rzz
-        ], -1)))
-        _R = lambda i, j: R[:, :, :, i, j]
-        signs = torch.sign(torch.stack([
-            _R(2, 1) - _R(1, 2),
-            _R(0, 2) - _R(2, 0),
-            _R(1, 0) - _R(0, 1)
-        ], -1))
+        magnitudes = 0.5 * torch.sqrt(
+            torch.abs(1 + torch.stack([Rxx - Ryy - Rzz, -Rxx + Ryy - Rzz, -Rxx - Ryy + Rzz], -1))
+        )
+
+        def _R(i, j):
+            return R[:, :, :, i, j]
+
+        signs = torch.sign(
+            torch.stack([_R(2, 1) - _R(1, 2), _R(0, 2) - _R(2, 0), _R(1, 0) - _R(0, 1)], -1)
+        )
         xyz = signs * magnitudes
         # The relu enforces a non-negative trace
-        w = torch.sqrt(F.relu(1 + diag.sum(-1, keepdim=True))) / 2.
+        w = torch.sqrt(F.relu(1 + diag.sum(-1, keepdim=True))) / 2.0
         Q = torch.cat((xyz, w), -1)
         Q = F.normalize(Q, dim=-1)
         return Q
@@ -106,14 +113,16 @@ class CA_ProteinFeatures(nn.Module):
         cosD = torch.clamp(cosD, -1 + eps, 1 - eps)
         D = torch.sign((u_2 * n_1).sum(-1)) * torch.acos(cosD)
         # Backbone features
-        AD_features = torch.stack((torch.cos(A), torch.sin(A) * torch.cos(D), torch.sin(A) * torch.sin(D)), 2)
-        AD_features = F.pad(AD_features, (0, 0, 1, 2), 'constant', 0)
+        AD_features = torch.stack(
+            (torch.cos(A), torch.sin(A) * torch.cos(D), torch.sin(A) * torch.sin(D)), 2
+        )
+        AD_features = F.pad(AD_features, (0, 0, 1, 2), "constant", 0)
 
         # Build relative orientations
         o_1 = F.normalize(u_2 - u_1, dim=-1)
         O = torch.stack((o_1, n_2, torch.cross(o_1, n_2)), 2)
         O = O.view(list(O.shape[:2]) + [9])
-        O = F.pad(O, (0, 0, 1, 2), 'constant', 0)
+        O = F.pad(O, (0, 0, 1, 2), "constant", 0)
         O_neighbors = gather_nodes(O, E_idx)
         X_neighbors = gather_nodes(X, E_idx)
 
@@ -132,28 +141,30 @@ class CA_ProteinFeatures(nn.Module):
         O_features = torch.cat((dU, Q), dim=-1)
         return AD_features, O_features
 
-    def _dist(self, X, mask, eps=1E-6):
+    def _dist(self, X, mask, eps=1e-6):
         """Compute pairwise euclidean distances."""
         mask_2D = torch.unsqueeze(mask, 1) * torch.unsqueeze(mask, 2)
         dX = torch.unsqueeze(X, 1) - torch.unsqueeze(X, 2)
-        D = mask_2D * torch.sqrt(torch.sum(dX ** 2, 3) + eps)
+        D = mask_2D * torch.sqrt(torch.sum(dX**2, 3) + eps)
 
         # Identify k nearest neighbors (including self)
         D_max, _ = torch.max(D, -1, keepdim=True)
-        D_adjust = D + (1. - mask_2D) * D_max
-        D_neighbors, E_idx = torch.topk(D_adjust, np.minimum(self.top_k, X.shape[1]), dim=-1, largest=False)
+        D_adjust = D + (1.0 - mask_2D) * D_max
+        D_neighbors, E_idx = torch.topk(
+            D_adjust, np.minimum(self.top_k, X.shape[1]), dim=-1, largest=False
+        )
         mask_neighbors = gather_edges(mask_2D.unsqueeze(-1), E_idx)
         return D_neighbors, E_idx, mask_neighbors
 
     def _rbf(self, D):
         """Compute radial basis function features."""
         device = D.device
-        D_min, D_max, D_count = 2., 22., self.num_rbf
+        D_min, D_max, D_count = 2.0, 22.0, self.num_rbf
         D_mu = torch.linspace(D_min, D_max, D_count).to(device)
         D_mu = D_mu.view([1, 1, 1, -1])
         D_sigma = (D_max - D_min) / D_count
         D_expand = torch.unsqueeze(D, -1)
-        RBF = torch.exp(-((D_expand - D_mu) / D_sigma) ** 2)
+        RBF = torch.exp(-(((D_expand - D_mu) / D_sigma) ** 2))
         return RBF
 
     def _get_rbf(self, A, B, E_idx):
@@ -211,8 +222,16 @@ class CA_ProteinFeatures(nn.Module):
 class ProteinFeatures(nn.Module):
     """Extract protein features from full backbone coordinates (N, CA, C, O)."""
 
-    def __init__(self, edge_features, node_features, num_positional_embeddings=16,
-                 num_rbf=16, top_k=30, augment_eps=0., num_chain_embeddings=16):
+    def __init__(
+        self,
+        edge_features,
+        node_features,
+        num_positional_embeddings=16,
+        num_rbf=16,
+        top_k=30,
+        augment_eps=0.0,
+        num_chain_embeddings=16,
+    ):
         """Initialize protein features.
 
         Args:
@@ -224,7 +243,7 @@ class ProteinFeatures(nn.Module):
             augment_eps: Noise augmentation epsilon
             num_chain_embeddings: Number of chain embeddings
         """
-        super(ProteinFeatures, self).__init__()
+        super().__init__()
         self.edge_features = edge_features
         self.node_features = node_features
         self.top_k = top_k
@@ -233,30 +252,31 @@ class ProteinFeatures(nn.Module):
         self.num_positional_embeddings = num_positional_embeddings
 
         self.embeddings = PositionalEncodings(num_positional_embeddings)
-        node_in, edge_in = 6, num_positional_embeddings + num_rbf * 25
+        _node_in, edge_in = 6, num_positional_embeddings + num_rbf * 25
         self.edge_embedding = nn.Linear(edge_in, edge_features, bias=False)
         self.norm_edges = nn.LayerNorm(edge_features)
 
-    def _dist(self, X, mask, eps=1E-6):
+    def _dist(self, X, mask, eps=1e-6):
         """Compute pairwise distances."""
         mask_2D = torch.unsqueeze(mask, 1) * torch.unsqueeze(mask, 2)
         dX = torch.unsqueeze(X, 1) - torch.unsqueeze(X, 2)
-        D = mask_2D * torch.sqrt(torch.sum(dX ** 2, 3) + eps)
+        D = mask_2D * torch.sqrt(torch.sum(dX**2, 3) + eps)
         D_max, _ = torch.max(D, -1, keepdim=True)
-        D_adjust = D + (1. - mask_2D) * D_max
-        sampled_top_k = self.top_k
-        D_neighbors, E_idx = torch.topk(D_adjust, np.minimum(self.top_k, X.shape[1]), dim=-1, largest=False)
+        D_adjust = D + (1.0 - mask_2D) * D_max
+        D_neighbors, E_idx = torch.topk(
+            D_adjust, np.minimum(self.top_k, X.shape[1]), dim=-1, largest=False
+        )
         return D_neighbors, E_idx
 
     def _rbf(self, D):
         """Compute radial basis function features."""
         device = D.device
-        D_min, D_max, D_count = 2., 22., self.num_rbf
+        D_min, D_max, D_count = 2.0, 22.0, self.num_rbf
         D_mu = torch.linspace(D_min, D_max, D_count, device=device)
         D_mu = D_mu.view([1, 1, 1, -1])
         D_sigma = (D_max - D_min) / D_count
         D_expand = torch.unsqueeze(D, -1)
-        RBF = torch.exp(-((D_expand - D_mu) / D_sigma) ** 2)
+        RBF = torch.exp(-(((D_expand - D_mu) / D_sigma) ** 2))
         return RBF
 
     def _get_rbf(self, A, B, E_idx):
@@ -320,5 +340,3 @@ class ProteinFeatures(nn.Module):
         E = self.edge_embedding(E)
         E = self.norm_edges(E)
         return E, E_idx
-
-

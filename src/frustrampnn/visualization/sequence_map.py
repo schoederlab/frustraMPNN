@@ -38,10 +38,10 @@ logger = logging.getLogger(__name__)
 # Color mapping for sequence map
 SEQUENCE_MAP_COLORS = {
     "minimally": "#90EE90",  # Light green
-    "neutral": "#D3D3D3",    # Light gray
-    "highly": "#FFB6C1",     # Light red/pink
+    "neutral": "#D3D3D3",  # Light gray
+    "highly": "#FFB6C1",  # Light red/pink
     "disagreement": "#00008B",  # Dark blue
-    "gap": "#FFFFFF",        # White for gaps
+    "gap": "#FFFFFF",  # White for gaps
 }
 
 
@@ -200,9 +200,11 @@ def plot_sequence_map(
 
     # Category to numeric mapping
     cat_to_num = {"minimally": 0, "neutral": 1, "highly": 2}
-    colors = [SEQUENCE_MAP_COLORS["minimally"],
-              SEQUENCE_MAP_COLORS["neutral"],
-              SEQUENCE_MAP_COLORS["highly"]]
+    colors = [
+        SEQUENCE_MAP_COLORS["minimally"],
+        SEQUENCE_MAP_COLORS["neutral"],
+        SEQUENCE_MAP_COLORS["highly"],
+    ]
     cmap = ListedColormap(colors)
 
     # Build matrix for visualization
@@ -211,14 +213,12 @@ def plot_sequence_map(
 
     # Row 1: Calculated (if provided)
     if calculated is not None:
-        calc_row = [cat_to_num.get(c, 1) if pd.notna(c) else np.nan
-                    for c in data["calculated"]]
+        calc_row = [cat_to_num.get(c, 1) if pd.notna(c) else np.nan for c in data["calculated"]]
         matrix_data.append(calc_row)
         row_labels.append("FrustratometeR")
 
     # Row 2: Predicted
-    pred_row = [cat_to_num.get(c, 1) if pd.notna(c) else np.nan
-                for c in data["predicted"]]
+    pred_row = [cat_to_num.get(c, 1) if pd.notna(c) else np.nan for c in data["predicted"]]
     matrix_data.append(pred_row)
     row_labels.append("FrustraMPNN")
 
@@ -247,7 +247,7 @@ def plot_sequence_map(
     if calculated is not None:
         disagree_cmap = ListedColormap(["white", SEQUENCE_MAP_COLORS["disagreement"]])
         ax.imshow(
-            matrix[n_main_rows:n_main_rows+1],
+            matrix[n_main_rows : n_main_rows + 1],
             aspect="auto",
             cmap=disagree_cmap,
             vmin=0,
@@ -267,10 +267,9 @@ def plot_sequence_map(
             if pos in positions:
                 x_idx = positions.index(pos)
                 color = ss_colors.get(ss, "#808080")
-                ax.add_patch(plt.Rectangle(
-                    (x_idx, ss_row_y), 1, 1,
-                    facecolor=color, edgecolor="none"
-                ))
+                ax.add_patch(
+                    plt.Rectangle((x_idx, ss_row_y), 1, 1, facecolor=color, edgecolor="none")
+                )
         row_labels.append("SecStruct")
 
     # Add surface markers (stars) if provided
@@ -279,8 +278,13 @@ def plot_sequence_map(
             if pos in positions:
                 x_idx = positions.index(pos)
                 ax.text(
-                    x_idx + 0.5, len(row_labels) + 0.3, "*",
-                    ha="center", va="center", fontsize=8, color="black"
+                    x_idx + 0.5,
+                    len(row_labels) + 0.3,
+                    "*",
+                    ha="center",
+                    va="center",
+                    fontsize=8,
+                    color="black",
                 )
 
     # Configure axes
@@ -407,14 +411,13 @@ def plot_sequence_map_plotly(
     )
 
     # Position labels for hover
-    pos_labels = [f"Pos {p+1}" for p in positions]
+    pos_labels = [f"Pos {p + 1}" for p in positions]
 
     row_idx = 1
 
     # Row 1: Calculated (if provided)
     if calculated is not None:
-        calc_values = [cat_to_num.get(c, 1) if pd.notna(c) else None
-                       for c in data["calculated"]]
+        calc_values = [cat_to_num.get(c, 1) if pd.notna(c) else None for c in data["calculated"]]
         calc_text = [c if pd.notna(c) else "gap" for c in data["calculated"]]
 
         fig.add_trace(
@@ -434,8 +437,7 @@ def plot_sequence_map_plotly(
         row_idx += 1
 
     # Row 2: Predicted
-    pred_values = [cat_to_num.get(c, 1) if pd.notna(c) else None
-                   for c in data["predicted"]]
+    pred_values = [cat_to_num.get(c, 1) if pd.notna(c) else None for c in data["predicted"]]
     pred_text = [c if pd.notna(c) else "gap" for c in data["predicted"]]
 
     fig.add_trace(
@@ -481,17 +483,19 @@ def plot_sequence_map_plotly(
     if secondary_structure is not None:
         ss_map = {"H": 2, "E": 1, "L": 0}
         ss_colorscale = [
-            [0, "#808080"],    # Loop - gray
+            [0, "#808080"],  # Loop - gray
             [0.5, "#FFD700"],  # Sheet - gold
-            [1, "#4169E1"],    # Helix - blue
+            [1, "#4169E1"],  # Helix - blue
         ]
 
         # Create mapping from position to ss
-        ss_dict = dict(zip(
-            secondary_structure["position"],
-            secondary_structure["ss"],
-            strict=False,
-        ))
+        ss_dict = dict(
+            zip(
+                secondary_structure["position"],
+                secondary_structure["ss"],
+                strict=False,
+            )
+        )
         ss_values = [ss_map.get(ss_dict.get(p, "L"), 0) for p in positions]
         ss_text = [ss_dict.get(p, "L") for p in positions]
 
@@ -539,11 +543,10 @@ def plot_sequence_map_plotly(
         fig.update_xaxes(
             tickmode="array",
             tickvals=[pos_labels[i] for i in tick_indices],
-            ticktext=[str(positions[i]+1) for i in tick_indices],
+            ticktext=[str(positions[i] + 1) for i in tick_indices],
             tickfont={"size": 8},
             row=n_rows,
             col=1,
         )
 
     return fig
-

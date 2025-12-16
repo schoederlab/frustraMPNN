@@ -19,7 +19,6 @@ from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeVar
 
 if TYPE_CHECKING:
-
     pass
 
 F = TypeVar("F", bound=Callable[..., Any])
@@ -137,4 +136,3 @@ def get_cached_pdb_parser(
         return parse_PDB(pdb_file)
 
     return lambda pdb_file: parse_pdb_cached(cfg, pdb_file)
-

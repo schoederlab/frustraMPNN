@@ -11,7 +11,7 @@ Backup: test_data/training/train_thermompnn_refac.py.bak
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 import torch
 import torch.nn.functional as F
@@ -87,10 +87,10 @@ def weighted_mse_loss(
 
 
 def batch_mse_loss(
-    predictions: List[torch.Tensor],
-    targets: List[torch.Tensor],
-    weights: Optional[List[float]] = None,
-    device: Optional[torch.device] = None,
+    predictions: list[torch.Tensor],
+    targets: list[torch.Tensor],
+    weights: list[float] | None = None,
+    device: torch.device | None = None,
 ) -> torch.Tensor:
     """
     Compute MSE loss for a batch of predictions.
@@ -123,7 +123,7 @@ def batch_mse_loss(
     if weights is not None:
         weight_sum = sum(w for w in weights if w is not None) or 1.0
 
-    for i, (pred, target) in enumerate(zip(predictions, targets)):
+    for i, (pred, target) in enumerate(zip(predictions, targets, strict=False)):
         if target is None:
             continue
 
@@ -181,9 +181,9 @@ class FrustrationLoss:
 
     def __call__(
         self,
-        predictions: List[dict],
-        mutations: List["TrainingMutation"],
-        device: Optional[torch.device] = None,
+        predictions: list[dict],
+        mutations: list[TrainingMutation],
+        device: torch.device | None = None,
     ) -> torch.Tensor:
         """
         Compute loss for predictions.
@@ -203,7 +203,7 @@ class FrustrationLoss:
         target_values = []
         weights = []
 
-        for pred, mut in zip(predictions, mutations):
+        for pred, mut in zip(predictions, mutations, strict=False):
             if mut.frustration is not None:
                 pred_values.append(pred["frustration"])
                 target_values.append(mut.frustration)
@@ -226,4 +226,3 @@ __all__ = [
     "batch_mse_loss",
     "FrustrationLoss",
 ]
-

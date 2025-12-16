@@ -99,9 +99,7 @@ class FrustraMPNN:
             map_location = device
 
         # Load checkpoint
-        checkpoint = torch.load(
-            checkpoint_path, map_location=map_location, weights_only=False
-        )
+        checkpoint = torch.load(checkpoint_path, map_location=map_location, weights_only=False)
 
         # Handle old vs new checkpoint format
         if config_path is not None:
@@ -145,9 +143,7 @@ class FrustraMPNN:
         possible_weight_dirs = [
             checkpoint_path.parent / "vanilla_model_weights",
             checkpoint_path.parent.parent / "inference" / "vanilla_model_weights",
-            Path(__file__).parent.parent.parent.parent
-            / "inference"
-            / "vanilla_model_weights",
+            Path(__file__).parent.parent.parent.parent / "inference" / "vanilla_model_weights",
         ]
 
         for weight_dir in possible_weight_dirs:
@@ -333,4 +329,3 @@ class FrustraMPNN:
 
     def __repr__(self) -> str:
         return f"FrustraMPNN(device={self.device})"
-

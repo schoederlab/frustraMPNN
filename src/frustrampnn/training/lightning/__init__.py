@@ -26,5 +26,3 @@ __all__ = [
     "get_checkpoint_callback",
     "load_checkpoint_safe",
 ]
-
-

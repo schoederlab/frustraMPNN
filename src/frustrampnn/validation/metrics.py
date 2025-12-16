@@ -69,6 +69,7 @@ def compute_spearman(
 
 def _spearman_fallback(x: np.ndarray, y: np.ndarray) -> float:
     """Compute Spearman correlation without scipy."""
+
     # Rank the values
     def rank_data(arr: np.ndarray) -> np.ndarray:
         sorted_indices = np.argsort(arr)

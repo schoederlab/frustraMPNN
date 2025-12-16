@@ -90,7 +90,7 @@ class PositionWiseFeedForward(nn.Module):
     """Position-wise feed-forward network."""
 
     def __init__(self, num_hidden, num_ff):
-        super(PositionWiseFeedForward, self).__init__()
+        super().__init__()
         self.W_in = nn.Linear(num_hidden, num_ff, bias=True)
         self.W_out = nn.Linear(num_ff, num_hidden, bias=True)
         self.act = torch.nn.GELU()
@@ -105,14 +105,15 @@ class PositionalEncodings(nn.Module):
     """Positional encodings for sequence positions."""
 
     def __init__(self, num_embeddings, max_relative_feature=32):
-        super(PositionalEncodings, self).__init__()
+        super().__init__()
         self.num_embeddings = num_embeddings
         self.max_relative_feature = max_relative_feature
         self.linear = nn.Linear(2 * max_relative_feature + 1 + 1, num_embeddings)
 
     def forward(self, offset, mask):
-        d = torch.clip(offset + self.max_relative_feature, 0, 2 * self.max_relative_feature) * mask + (1 - mask) * (
-                2 * self.max_relative_feature + 1)
+        d = torch.clip(
+            offset + self.max_relative_feature, 0, 2 * self.max_relative_feature
+        ) * mask + (1 - mask) * (2 * self.max_relative_feature + 1)
         d_onehot = torch.nn.functional.one_hot(d, 2 * self.max_relative_feature + 1 + 1)
         E = self.linear(d_onehot.float())
         return E
@@ -122,7 +123,7 @@ class EncLayer(nn.Module):
     """Encoder layer for ProteinMPNN."""
 
     def __init__(self, num_hidden, num_in, dropout=0.1, num_heads=None, scale=30):
-        super(EncLayer, self).__init__()
+        super().__init__()
         self.num_hidden = num_hidden
         self.num_in = num_in
         self.scale = scale
@@ -171,7 +172,7 @@ class DecLayer(nn.Module):
     """Decoder layer for ProteinMPNN."""
 
     def __init__(self, num_hidden, num_in, dropout=0.1, num_heads=None, scale=30):
-        super(DecLayer, self).__init__()
+        super().__init__()
         self.num_hidden = num_hidden
         self.num_in = num_in
         self.scale = scale
@@ -207,5 +208,3 @@ class DecLayer(nn.Module):
             mask_V = mask_V.unsqueeze(-1)
             h_V = mask_V * h_V
         return h_V
-
-

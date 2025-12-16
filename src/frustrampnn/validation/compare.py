@@ -320,9 +320,7 @@ def quick_validate(
 
     # Select random positions
     random.seed(seed)
-    selected_positions = random.sample(
-        all_positions, min(n_positions, len(all_positions))
-    )
+    selected_positions = random.sample(all_positions, min(n_positions, len(all_positions)))
 
     logger.info(f"Quick validation with positions: {selected_positions}")
 

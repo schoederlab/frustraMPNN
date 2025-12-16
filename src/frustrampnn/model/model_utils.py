@@ -77,13 +77,14 @@ def get_esm_model(esm_model_name: str):
     }
 
     if esm_model_name not in esm_models:
-        raise ValueError(f"Unknown ESM model: {esm_model_name}. "
-                         f"Available: {list(esm_models.keys())}")
+        raise ValueError(
+            f"Unknown ESM model: {esm_model_name}. Available: {list(esm_models.keys())}"
+        )
 
     return esm_models[esm_model_name]()
 
 
-def get_protein_mpnn(cfg, version: str = 'v_48_020.pt'):
+def get_protein_mpnn(cfg, version: str = "v_48_020.pt"):
     """Load pretrained ProteinMPNN model.
 
     Args:
@@ -98,13 +99,10 @@ def get_protein_mpnn(cfg, version: str = 'v_48_020.pt'):
     hidden_dim = 128
     num_layers = 3
 
-    model_weight_dir = os.path.join(
-        cfg.platform.thermompnn_dir,
-        'vanilla_model_weights'
-    )
+    model_weight_dir = os.path.join(cfg.platform.thermompnn_dir, "vanilla_model_weights")
 
     checkpoint_path = os.path.join(model_weight_dir, version)
-    checkpoint = torch.load(checkpoint_path, map_location='cpu')
+    checkpoint = torch.load(checkpoint_path, map_location="cpu")
 
     model = ProteinMPNN(
         ca_only=False,
@@ -114,12 +112,12 @@ def get_protein_mpnn(cfg, version: str = 'v_48_020.pt'):
         hidden_dim=hidden_dim,
         num_encoder_layers=num_layers,
         num_decoder_layers=num_layers,
-        k_neighbors=checkpoint['num_edges'],
+        k_neighbors=checkpoint["num_edges"],
         augment_eps=0.0,
     )
 
     if cfg.model.load_pretrained:
-        model.load_state_dict(checkpoint['model_state_dict'])
+        model.load_state_dict(checkpoint["model_state_dict"])
 
     if cfg.model.freeze_weights:
         model.eval()
@@ -128,5 +126,3 @@ def get_protein_mpnn(cfg, version: str = 'v_48_020.pt'):
             param.requires_grad = False
 
     return model
-
-

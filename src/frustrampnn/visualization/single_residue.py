@@ -277,5 +277,3 @@ def plot_single_residue_plotly(
     fig.update_yaxes(showline=True, linewidth=1, linecolor="black", mirror=True)
 
     return fig
-
-

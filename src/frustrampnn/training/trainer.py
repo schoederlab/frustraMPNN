@@ -252,4 +252,3 @@ class Trainer:
     def lightning_trainer(self) -> pl.Trainer | None:
         """Get the underlying Lightning Trainer."""
         return self._trainer
-

@@ -105,9 +105,7 @@ def parse_mutation_string(mutation_str: str) -> Mutation:
     match = re.match(pattern, mutation_str.upper())
 
     if not match:
-        raise ValueError(
-            f"Invalid mutation format: {mutation_str}. Expected format: A73G"
-        )
+        raise ValueError(f"Invalid mutation format: {mutation_str}. Expected format: A73G")
 
     wildtype, position_str, mutation = match.groups()
     position = int(position_str) - 1  # Convert to 0-indexed

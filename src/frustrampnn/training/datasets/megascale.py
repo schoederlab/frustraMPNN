@@ -138,9 +138,7 @@ class MegaScaleDataset(BaseDataset):
 
         # Get proteins for this split (matches original)
         if self.split == "all":
-            all_names = (
-                self._splits["train"] + self._splits["val"] + self._splits["test"]
-            )
+            all_names = self._splits["train"] + self._splits["val"] + self._splits["test"]
             self.split_wt_names[self.split] = all_names
         else:
             if getattr(cfg, "reduce", "") == "prot" and self.split == "train":
@@ -151,8 +149,7 @@ class MegaScaleDataset(BaseDataset):
             else:
                 if self.split not in self._splits:
                     raise ValueError(
-                        f"Split '{self.split}' not found. "
-                        f"Available: {list(self._splits.keys())}"
+                        f"Split '{self.split}' not found. Available: {list(self._splits.keys())}"
                     )
                 self.split_wt_names[self.split] = self._splits[self.split]
 
@@ -240,4 +237,3 @@ class MegaScaleDataset(BaseDataset):
     def get_mutation_count(self) -> int:
         """Get total number of mutations across all proteins."""
         return sum(len(self.mut_rows[name]) for name in self.wt_names)
-

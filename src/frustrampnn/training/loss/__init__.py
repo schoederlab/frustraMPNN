@@ -38,4 +38,3 @@ __all__ = [
     "VALID_WEIGHT_METHODS",
     "validate_weight_method",
 ]
-

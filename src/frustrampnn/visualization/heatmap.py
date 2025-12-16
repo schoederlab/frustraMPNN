@@ -222,5 +222,3 @@ def plot_frustration_heatmap_plotly(
     )
 
     return fig
-
-
