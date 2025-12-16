@@ -122,6 +122,9 @@ def test_frustrampnn_generate_mutations_with_gap():
 
 def test_frustrampnn_get_chains(test_pdb_path):
     """Test chain extraction from PDB."""
+    if not test_pdb_path.exists():
+        pytest.skip("Test PDB file not available")
+
     from frustrampnn import FrustraMPNN
 
     model = FrustraMPNN.__new__(FrustraMPNN)
