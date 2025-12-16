@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FrustraMPNN | Ultra-fast Deep Learning for Protein Frustration Analysis</title>
+    <meta name="description" content="FrustraMPNN: A message-passing neural network for proteome-scale prediction of single-residue local energetic frustration in proteins.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-logo">FrustraMPNN</a>
+            <ul class="nav-links">
+                <li><a href="#abstract">Abstract</a></li>
+                <li><a href="#results">Results</a></li>
+                <li><a href="#methods">Methods</a></li>
+                <li><a href="#resources">Resources</a></li>
+                <li><a href="#citation">Citation</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1 class="paper-title">FrustraMPNN</h1>
+                <p class="paper-subtitle">An ultra-fast deep learning tool for proteome-scale analysis of single-residue local energetic frustration profiles in proteins</p>
+                
+                <div class="authors">
+                    <p class="author-list">
+                        Max Beining<sup>1,2*</sup>, 
+                        Felipe Engelberger<sup>1*</sup>, 
+                        Clara T. Schoeder<sup>1,3</sup>, 
+                        César A. Ramírez-Sarmiento<sup>3,4,5</sup>, 
+                        Jens Meiler<sup>1,2,3,6</sup>
+                    </p>
+                    <p class="author-note">* These authors contributed equally</p>
+                </div>
+
+                <div class="affiliations">
+                    <p><sup>1</sup>Institute for Drug Discovery, Leipzig University, Germany</p>
+                    <p><sup>2</sup>School of Embedded Composite Artificial Intelligence (SECAI), Dresden/Leipzig, Germany</p>
+                    <p><sup>3</sup>Center for Scalable Data Analytics and Artificial Intelligence (ScaDS.AI), Dresden/Leipzig, Germany</p>
+                    <p><sup>4</sup>Institute for Biological and Medical Engineering, Pontificia Universidad Católica de Chile, Santiago, Chile</p>
+                    <p><sup>5</sup>Millennium Institute for Integrative Biology (iBio), Santiago, Chile</p>
+                    <p><sup>6</sup>Department of Chemistry, Vanderbilt University, Nashville, TN, USA</p>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="https://github.com/schoederlab/frustraMPNN" class="btn btn-primary">GitHub Repository</a>
+                    <a href="https://colab.research.google.com/github/schoederlab/frustraMPNN/blob/main/notebooks/FrustraMPNN_Colab.ipynb" class="btn btn-secondary">Try in Colab</a>
+                    <a href="#citation" class="btn btn-outline">Cite</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Findings -->
+        <section class="key-findings">
+            <div class="container">
+                <div class="findings-grid">
+                    <div class="finding-card">
+                        <div class="finding-value">7,000×</div>
+                        <div class="finding-label">Speedup</div>
+                        <div class="finding-detail">E. coli proteome: 12 GPU-hours vs 1.7 CPU-years</div>
+                    </div>
+                    <div class="finding-card">
+                        <div class="finding-value">0.80</div>
+                        <div class="finding-label">Spearman ρ</div>
+                        <div class="finding-detail">External validation on 3,921 human proteins</div>
+                    </div>
+                    <div class="finding-card">
+                        <div class="finding-value">75%</div>
+                        <div class="finding-label">Accuracy</div>
+                        <div class="finding-detail">Categorical frustration prediction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Abstract -->
+        <section id="abstract" class="section">
+            <div class="container">
+                <h2>Abstract</h2>
+                <div class="abstract-content">
+                    <p>Energetic frustration, characterized by conflicting local interactions, is a key determinant of protein dynamics, allostery, protein-protein interactions, enzymatic catalysis, and overall protein function. Although the principle of minimal frustration drives the global minimization of energetic conflicts for overall protein folding, local violations are selectively embedded to encode the complex energy landscapes necessary for these functions.</p>
+                    
+                    <p>However, the immense computational cost of traditional deep mutational single-residue frustration analysis has prevented its application at the proteome scale, creating a significant bottleneck in structural biology. Here, we introduce <strong>FrustraMPNN</strong>, a message-passing neural network retrained via transfer learning that predicts a complete per-residue frustration-index mutation profile orders of magnitude faster than existing methods while maintaining high accuracy.</p>
+                    
+                    <p>We validate FrustraMPNN on a diverse external set of over 3,300 human protein structures, achieving a Spearman correlation of up to 0.80 across all frustration categories, demonstrating robust generalizability. By conducting a thorough dataset ablation study, we find that the model's performance improves when trained on a broader range of protein sizes, highlighting an inherent limitation of datasets like Megascale.</p>
+                    
+                    <p>We provide FrustraMPNN as an open-source tool, expecting that this model will enable exploration of new hypotheses in fields such as personalized structural biology, the local energetic frustration patterns involved in protein function, and proteomics at an unprecedented scale.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- What is Frustration -->
+        <section class="section section-alt">
+            <div class="container">
+                <h2>What is Local Energetic Frustration?</h2>
+                <div class="two-column">
+                    <div class="column">
+                        <p>Local energetic frustration describes regions in proteins where amino acid interactions are not optimally satisfied. In the native state, most interactions are optimized to maintain structural stability (<span class="frustration-minimal">minimally frustrated</span>). However, specific areas with conflicting interactions create local energetic tensions (<span class="frustration-highly">highly frustrated</span>).</p>
+                        
+                        <p>Rather than being structural defects, these locally frustrated regions are often evolutionarily selected features critical for biological function:</p>
+                        
+                        <ul class="feature-list">
+                            <li><strong>Enzyme catalysis:</strong> Active site residues in energetically unfavorable conformations necessary for chemical reactions</li>
+                            <li><strong>Allostery:</strong> Frustration patterns drive protein dynamics essential for allosteric regulation</li>
+                            <li><strong>Protein-protein interactions:</strong> Conformational flexibility at interfaces mediated by frustration</li>
+                            <li><strong>Viral life cycles:</strong> Frustration governs conformational switches in viral proteins</li>
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <div class="frustration-legend">
+                            <h4>Frustration Categories</h4>
+                            <div class="legend-item">
+                                <span class="legend-color legend-highly"></span>
+                                <div class="legend-text">
+                                    <strong>Highly frustrated</strong> (index ≤ −1.0)<br>
+                                    Conflicting interactions, often functional
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color legend-neutral"></span>
+                                <div class="legend-text">
+                                    <strong>Neutral</strong> (−1.0 &lt; index &lt; 0.58)<br>
+                                    Average interactions
+                                </div>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color legend-minimal"></span>
+                                <div class="legend-text">
+                                    <strong>Minimally frustrated</strong> (index ≥ 0.58)<br>
+                                    Optimized interactions, stable
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results -->
+        <section id="results" class="section">
+            <div class="container">
+                <h2>Results</h2>
+                
+                <h3>Computational Acceleration</h3>
+                <p>FrustraMPNN achieves orders-of-magnitude speedup over existing physics-based methods. For single-residue frustration analysis, which requires evaluating all 20 amino acids at each position, the acceleration is particularly significant.</p>
+                
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Protein Size</th>
+                                <th>FrustraMPNN (GPU)</th>
+                                <th>FrustratometeR (1 CPU)</th>
+                                <th>Speedup</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>100 residues</td>
+                                <td>~20 ms</td>
+                                <td>~3.4 min</td>
+                                <td>1,200×</td>
+                            </tr>
+                            <tr>
+                                <td>300 residues</td>
+                                <td>~30 s</td>
+                                <td>~19 h</td>
+                                <td>2,300×</td>
+                            </tr>
+                            <tr>
+                                <td>500 residues</td>
+                                <td>~30 s</td>
+                                <td>~35 h</td>
+                                <td>4,500×</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p>As an exemplar case, we analyzed the complete <em>E. coli</em> proteome (~4,300 proteins) in single-residue mode, which would require approximately 1.7 CPU-years with FrustratometeR, but can be completed in less than 12 GPU-hours with FrustraMPNN—a 7,000-fold reduction in computational time.</p>
+
+                <h3>Model Performance</h3>
+                <p>We validated FrustraMPNN on an external dataset of 3,921 human protein structures from the AlphaFold Protein Structure Database. The model trained on the balanced FireProt dataset with ESM embeddings and light attention achieved the best generalization performance.</p>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Model Configuration</th>
+                                <th colspan="3">Internal Test Set</th>
+                                <th colspan="3">External Validation</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th>RMSE</th>
+                                <th>SCC</th>
+                                <th>Acc.</th>
+                                <th>RMSE</th>
+                                <th>SCC</th>
+                                <th>Acc.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FireProt Default</td>
+                                <td>0.659±0.034</td>
+                                <td>0.699±0.023</td>
+                                <td>0.71</td>
+                                <td>0.82±0.04</td>
+                                <td>0.68±0.03</td>
+                                <td>0.65</td>
+                            </tr>
+                            <tr>
+                                <td>FireProt Default + ESM</td>
+                                <td>0.639±0.018</td>
+                                <td>0.718±0.017</td>
+                                <td>0.73</td>
+                                <td>0.79±0.03</td>
+                                <td>0.71±0.02</td>
+                                <td>0.68</td>
+                            </tr>
+                            <tr>
+                                <td>FireProt Saturated + LightAtt</td>
+                                <td>0.649±0.014</td>
+                                <td>0.790±0.010</td>
+                                <td>0.78</td>
+                                <td>0.77±0.03</td>
+                                <td>0.75±0.02</td>
+                                <td>0.71</td>
+                            </tr>
+                            <tr class="highlight-row">
+                                <td><strong>FireProt Balanced + ESM + LightAtt</strong></td>
+                                <td>0.716±0.012</td>
+                                <td>0.823±0.003</td>
+                                <td>0.81</td>
+                                <td><strong>0.74±0.02</strong></td>
+                                <td><strong>0.80±0.01</strong></td>
+                                <td><strong>0.75</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="table-caption">Table: FrustraMPNN performance across training configurations. RMSE = Root mean squared error, SCC = Spearman's correlation coefficient, Acc = Accuracy.</p>
+
+                <h3>Enzyme Active Site Validation</h3>
+                <p>We validated FrustraMPNN predictions against FrustratometeR calculations across three representative enzymes: Class A beta-lactamase (PDB: 4BLM), Serine-carboxyl proteinase (PDB: 1NLU), and Beta-glucosidase (PDB: 1CBG). FrustraMPNN accurately recapitulates the global frustration landscapes, particularly preserving the high-frustration signals characteristic of catalytic sites.</p>
+                
+                <p>For beta-lactamase, the highly frustrated key residues Lys73, Glu166, and Lys234, together with the neutrally frustrated Ser70, Ser130, and Ala237, were correctly identified by both FrustratometeR calculation and FrustraMPNN prediction.</p>
+            </div>
+        </section>
+
+        <!-- Methods -->
+        <section id="methods" class="section section-alt">
+            <div class="container">
+                <h2>Methods</h2>
+                
+                <h3>Architecture</h3>
+                <p>FrustraMPNN employs a graph-based neural network architecture specifically designed to capture the local structural context that determines local energetic frustration. Proteins are modeled as graphs, with each residue as a node and edges connecting spatially proximate 48-residue neighbors.</p>
+                
+                <div class="architecture-description">
+                    <ol>
+                        <li><strong>Structure Encoder:</strong> Input backbone coordinates (N, Cα, C) are converted into pairwise distances and processed to capture geometric constraints</li>
+                        <li><strong>Sequence Decoder:</strong> Conditions structural features on the wild-type sequence embedding</li>
+                        <li><strong>Light Attention Block:</strong> Assigns weights to different features, enabling the model to focus on the most informative structural characteristics</li>
+                        <li><strong>MLP Head:</strong> Two hidden layers map the learned representations to continuous frustration indices for each residue</li>
+                        <li><strong>ESM Embeddings (optional):</strong> Evolutionary information from ESM-2 language model can be concatenated to improve predictions</li>
+                    </ol>
+                </div>
+
+                <h3>Training Data</h3>
+                <p>We trained FrustraMPNN using two distinct datasets:</p>
+                <ul>
+                    <li><strong>FireProt:</strong> 3,438 experimentally characterized stability mutations from 100 natural proteins (45–495 residues), representing diverse folds and functions</li>
+                    <li><strong>Megascale:</strong> 272,712 systematic mutational scans of natural and de novo designed proteins, primarily under 75 residues</li>
+                </ul>
+                
+                <p>The superior generalization of the FireProt-trained model demonstrates that structural diversity in training data outweighs sheer data volume—a key finding for biological machine learning.</p>
+            </div>
+        </section>
+
+        <!-- Resources -->
+        <section id="resources" class="section">
+            <div class="container">
+                <h2>Resources</h2>
+                
+                <div class="resources-grid">
+                    <div class="resource-card">
+                        <h3>Installation</h3>
+                        <div class="code-block">
+                            <code>pip install frustrampnn[viz]</code>
+                        </div>
+                        <p>Or from source:</p>
+                        <div class="code-block">
+                            <code>git clone https://github.com/schoederlab/frustraMPNN.git<br>cd frustraMPNN<br>pip install -e ".[all]"</code>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-card">
+                        <h3>Quick Start</h3>
+                        <div class="code-block">
+<pre><code>from frustrampnn import FrustraMPNN
+
+# Load model
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt")
+
+# Predict frustration
+results = model.predict("protein.pdb")
+
+# View results
+print(results.head())</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="resource-card">
+                        <h3>Links</h3>
+                        <ul class="resource-links">
+                            <li><a href="https://github.com/schoederlab/frustraMPNN">GitHub Repository</a></li>
+                            <li><a href="https://colab.research.google.com/github/schoederlab/frustraMPNN/blob/main/notebooks/FrustraMPNN_Colab.ipynb">Google Colab Notebook</a></li>
+                            <li><a href="https://github.com/schoederlab/frustraMPNN/tree/main/docs">Documentation</a></li>
+                            <li><a href="https://github.com/engelberger/frustrapy">frustrapy (validation)</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="resource-card">
+                        <h3>Docker/Singularity</h3>
+                        <div class="code-block">
+                            <code># Docker<br>bash docker/run_docker.sh predict \<br>  --pdb protein.pdb \<br>  --checkpoint model.ckpt</code>
+                        </div>
+                        <div class="code-block">
+                            <code># Singularity (HPC)<br>singularity exec --nv frustrampnn.sif \<br>  frustrampnn predict --pdb protein.pdb</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Citation -->
+        <section id="citation" class="section section-alt">
+            <div class="container">
+                <h2>Citation</h2>
+                <p>If you use FrustraMPNN in your research, please cite:</p>
+                
+                <div class="citation-box">
+                    <p class="citation-text">Beining M*, Engelberger F*, Schoeder CT, Ramírez-Sarmiento CA, Meiler J. <strong>FrustraMPNN: An ultra-fast deep learning tool for proteome-scale analysis of deep mutational single residue local energetic frustration profiles in proteins.</strong> <em>bioRxiv</em> (2024).</p>
+                </div>
+                
+                <h4>BibTeX</h4>
+                <div class="code-block bibtex">
+<pre><code>@article{beining2024frustrampnn,
+  title={FrustraMPNN: An ultra-fast deep learning tool for proteome-scale 
+         analysis of single-residue local energetic frustration},
+  author={Beining, Max and Engelberger, Felipe and Schoeder, Clara T. and 
+          Ram{\'\i}rez-Sarmiento, C{\'e}sar A. and Meiler, Jens},
+  journal={bioRxiv},
+  year={2024}
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="section">
+            <div class="container">
+                <h2>Contact</h2>
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <strong>Dr. César A. Ramírez-Sarmiento</strong><br>
+                        Pontificia Universidad Católica de Chile<br>
+                        <a href="mailto:cesar.ramirez@uc.cl">cesar.ramirez@uc.cl</a>
+                    </div>
+                    <div class="contact-card">
+                        <strong>Dr. Clara T. Schoeder</strong><br>
+                        Leipzig University<br>
+                        <a href="mailto:clara.schoeder@medizin.uni-leipzig.de">clara.schoeder@medizin.uni-leipzig.de</a>
+                    </div>
+                    <div class="contact-card">
+                        <strong>Prof. Jens Meiler</strong><br>
+                        Leipzig University<br>
+                        <a href="mailto:jens@meilerlab.org">jens@meilerlab.org</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>FrustraMPNN</h4>
+                    <p>Ultra-fast deep learning for protein frustration analysis</p>
+                    <p>Released under the MIT License</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN">GitHub</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/issues">Issues</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/tree/main/docs">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Related</h4>
+                    <ul>
+                        <li><a href="https://github.com/engelberger/frustrapy">frustrapy</a></li>
+                        <li><a href="https://github.com/dauparas/ProteinMPNN">ProteinMPNN</a></li>
+                        <li><a href="https://github.com/Kuhlman-Lab/ThermoMPNN">ThermoMPNN</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Schoeder Lab, Leipzig University. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

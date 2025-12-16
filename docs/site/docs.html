@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation | FrustraMPNN</title>
+    <meta name="description" content="FrustraMPNN documentation: installation, usage, API reference, and tutorials.">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav-container">
+            <a href="index.html" class="nav-logo">FrustraMPNN</a>
+            <ul class="nav-links">
+                <li><a href="index.html">Paper</a></li>
+                <li><a href="docs.html">Documentation</a></li>
+                <li><a href="https://github.com/schoederlab/frustraMPNN">GitHub</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="section">
+            <div class="container">
+                <h1>Documentation</h1>
+                <p class="lead">Complete guide to installing and using FrustraMPNN for protein frustration analysis.</p>
+
+                <nav class="doc-nav">
+                    <ul>
+                        <li><a href="#installation">Installation</a></li>
+                        <li><a href="#quickstart">Quick Start</a></li>
+                        <li><a href="#python-api">Python API</a></li>
+                        <li><a href="#cli">Command Line</a></li>
+                        <li><a href="#visualization">Visualization</a></li>
+                        <li><a href="#validation">Validation</a></li>
+                        <li><a href="#containers">Docker/Singularity</a></li>
+                    </ul>
+                </nav>
+
+                <!-- Installation -->
+                <section id="installation" class="doc-section">
+                    <h2>Installation</h2>
+                    
+                    <h3>Requirements</h3>
+                    <ul>
+                        <li>Python 3.10 or higher</li>
+                        <li>PyTorch 2.0 or higher</li>
+                        <li>CUDA-capable GPU (recommended, but CPU works)</li>
+                    </ul>
+
+                    <h3>pip install (Recommended)</h3>
+                    <div class="code-block">
+                        <code>pip install frustrampnn[viz]</code>
+                    </div>
+
+                    <h3>From source</h3>
+                    <div class="code-block">
+<pre><code>git clone https://github.com/schoederlab/frustraMPNN.git
+cd frustraMPNN
+pip install -e ".[all]"</code></pre>
+                    </div>
+
+                    <h3>Using uv (fast)</h3>
+                    <div class="code-block">
+<pre><code>curl -LsSf https://astral.sh/uv/install.sh | sh
+git clone https://github.com/schoederlab/frustraMPNN.git
+cd frustraMPNN
+uv sync --all-extras</code></pre>
+                    </div>
+
+                    <h3>Google Colab</h3>
+                    <p>For zero-installation access:</p>
+                    <p><a href="https://colab.research.google.com/github/schoederlab/frustraMPNN/blob/main/notebooks/FrustraMPNN_Colab.ipynb" class="btn btn-primary">Open in Colab</a></p>
+
+                    <h3>Optional Dependencies</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Group</th>
+                                    <th>Dependencies</th>
+                                    <th>Use Case</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>viz</code></td>
+                                    <td>matplotlib, seaborn, plotly, py3Dmol</td>
+                                    <td>Visualization</td>
+                                </tr>
+                                <tr>
+                                    <td><code>train</code></td>
+                                    <td>pytorch-lightning, torchmetrics, wandb</td>
+                                    <td>Training models</td>
+                                </tr>
+                                <tr>
+                                    <td><code>esm</code></td>
+                                    <td>fair-esm</td>
+                                    <td>ESM embeddings</td>
+                                </tr>
+                                <tr>
+                                    <td><code>validation</code></td>
+                                    <td>scipy</td>
+                                    <td>Statistical validation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>all</code></td>
+                                    <td>All of the above</td>
+                                    <td>Full installation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Quick Start -->
+                <section id="quickstart" class="doc-section">
+                    <h2>Quick Start</h2>
+                    
+                    <h3>Basic Usage</h3>
+                    <div class="code-block">
+<pre><code>from frustrampnn import FrustraMPNN
+
+# Load model
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt")
+
+# Predict frustration for all positions
+results = model.predict("protein.pdb")
+
+# View results
+print(results.head(20))</code></pre>
+                    </div>
+
+                    <h3>Output Format</h3>
+                    <p>Results are returned as a pandas DataFrame:</p>
+                    <div class="code-block">
+<pre><code>   frustration_pred  position wildtype mutation   pdb chain
+0          0.334012         0        M        A  1UBQ     A
+1          1.410234         0        M        C  1UBQ     A
+2         -0.892341         0        M        D  1UBQ     A
+...</code></pre>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Column</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>frustration_pred</code></td>
+                                    <td>Predicted frustration index</td>
+                                </tr>
+                                <tr>
+                                    <td><code>position</code></td>
+                                    <td>0-indexed residue position</td>
+                                </tr>
+                                <tr>
+                                    <td><code>wildtype</code></td>
+                                    <td>Original amino acid (1-letter code)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>mutation</code></td>
+                                    <td>Substituted amino acid</td>
+                                </tr>
+                                <tr>
+                                    <td><code>pdb</code></td>
+                                    <td>PDB identifier</td>
+                                </tr>
+                                <tr>
+                                    <td><code>chain</code></td>
+                                    <td>Chain identifier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Frustration Categories</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Frustration Index</th>
+                                    <th>Interpretation</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="frustration-highly">Highly frustrated</span></td>
+                                    <td>≤ −1.0</td>
+                                    <td>Conflicting interactions, often functional</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="frustration-neutral">Neutral</span></td>
+                                    <td>−1.0 to 0.58</td>
+                                    <td>Average interactions</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="frustration-minimal">Minimally frustrated</span></td>
+                                    <td>≥ 0.58</td>
+                                    <td>Optimized interactions, stable</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Filter Native Residues</h3>
+                    <div class="code-block">
+<pre><code># Get native residue frustration (wildtype == mutation)
+native = results[results['wildtype'] == results['mutation']]
+
+# Find highly frustrated positions
+highly_frustrated = native[native['frustration_pred'] <= -1.0]
+print(f"Highly frustrated positions: {highly_frustrated['position'].tolist()}")</code></pre>
+                    </div>
+                </section>
+
+                <!-- Python API -->
+                <section id="python-api" class="doc-section">
+                    <h2>Python API</h2>
+
+                    <h3>FrustraMPNN Class</h3>
+                    <div class="code-block">
+<pre><code>from frustrampnn import FrustraMPNN
+
+# Load from checkpoint
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt")
+
+# Load with specific device
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt", device="cuda")
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt", device="cpu")</code></pre>
+                    </div>
+
+                    <h3>predict()</h3>
+                    <div class="code-block">
+<pre><code>results = model.predict(
+    pdb_path="protein.pdb",
+    chains=["A"],           # Optional: specific chains
+    show_progress=True,     # Show progress bar
+)</code></pre>
+                    </div>
+
+                    <h3>predict_batch()</h3>
+                    <div class="code-block">
+<pre><code>from pathlib import Path
+
+pdb_files = list(Path("structures/").glob("*.pdb"))
+results = model.predict_batch(
+    [str(f) for f in pdb_files],
+    chains=["A"],
+    show_progress=True
+)
+results.to_csv("all_results.csv", index=False)</code></pre>
+                    </div>
+
+                    <h3>Batch Processing</h3>
+                    <div class="code-block">
+<pre><code>from frustrampnn import FrustraMPNN
+from pathlib import Path
+import pandas as pd
+
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt")
+
+all_results = []
+for pdb_file in Path("structures/").glob("*.pdb"):
+    try:
+        results = model.predict(str(pdb_file), chains=["A"])
+        all_results.append(results)
+    except Exception as e:
+        print(f"Failed {pdb_file.name}: {e}")
+
+combined = pd.concat(all_results, ignore_index=True)
+combined.to_csv("all_results.csv", index=False)</code></pre>
+                    </div>
+                </section>
+
+                <!-- CLI -->
+                <section id="cli" class="doc-section">
+                    <h2>Command Line Interface</h2>
+
+                    <h3>Basic Prediction</h3>
+                    <div class="code-block">
+<pre><code>frustrampnn predict \
+    --pdb protein.pdb \
+    --checkpoint model.ckpt \
+    --output results.csv</code></pre>
+                    </div>
+
+                    <h3>Batch Processing</h3>
+                    <div class="code-block">
+<pre><code>frustrampnn batch ./structures/ \
+    --checkpoint model.ckpt \
+    --output-dir ./results/ \
+    --pattern "*.pdb" \
+    --chains A \
+    --device cuda</code></pre>
+                    </div>
+
+                    <h3>Options</h3>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Option</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>--pdb</code></td>
+                                    <td>Path to PDB file</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--checkpoint</code></td>
+                                    <td>Path to model checkpoint</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--output</code></td>
+                                    <td>Output file path</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--chains</code></td>
+                                    <td>Chain(s) to analyze</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--device</code></td>
+                                    <td>Device (cuda, cpu)</td>
+                                </tr>
+                                <tr>
+                                    <td><code>--format</code></td>
+                                    <td>Output format (csv, json)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- Visualization -->
+                <section id="visualization" class="doc-section">
+                    <h2>Visualization</h2>
+
+                    <h3>Single-Residue Plot</h3>
+                    <p>Show frustration for all 20 amino acids at a specific position:</p>
+                    <div class="code-block">
+<pre><code>from frustrampnn.visualization import plot_single_residue
+
+fig = plot_single_residue(
+    results,
+    position=72,
+    chain="A",
+    title="Position 73 - Active Site"
+)
+fig.savefig("position_73.png", dpi=300, bbox_inches='tight')</code></pre>
+                    </div>
+
+                    <h3>Interactive Plot (Plotly)</h3>
+                    <div class="code-block">
+<pre><code>from frustrampnn.visualization import plot_single_residue_plotly
+
+fig = plot_single_residue_plotly(results, position=72, chain="A")
+fig.show()
+fig.write_html("position_73.html")</code></pre>
+                    </div>
+
+                    <h3>Heatmap</h3>
+                    <p>Show frustration across all positions:</p>
+                    <div class="code-block">
+<pre><code>from frustrampnn.visualization import plot_frustration_heatmap
+
+fig = plot_frustration_heatmap(results, chain="A")
+fig.savefig("heatmap.png", dpi=300, bbox_inches='tight')</code></pre>
+                    </div>
+
+                    <h3>Interactive Heatmap</h3>
+                    <div class="code-block">
+<pre><code>from frustrampnn.visualization import plot_frustration_heatmap_plotly
+
+fig = plot_frustration_heatmap_plotly(results, chain="A")
+fig.write_html("heatmap.html")</code></pre>
+                    </div>
+
+                    <h3>Color Scheme</h3>
+                    <p>FrustraMPNN uses a consistent color scheme matching frustrapy:</p>
+                    <div class="frustration-legend" style="max-width: 400px;">
+                        <div class="legend-item">
+                            <span class="legend-color legend-highly"></span>
+                            <div class="legend-text"><strong>Highly frustrated</strong> (≤ −1.0)</div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color legend-neutral"></span>
+                            <div class="legend-text"><strong>Neutral</strong> (−1.0 to 0.58)</div>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color legend-minimal"></span>
+                            <div class="legend-text"><strong>Minimally frustrated</strong> (≥ 0.58)</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Validation -->
+                <section id="validation" class="doc-section">
+                    <h2>Validation</h2>
+                    <p>Compare FrustraMPNN predictions with physics-based FrustratometeR calculations:</p>
+
+                    <div class="code-block">
+<pre><code>from frustrampnn import FrustraMPNN
+from frustrampnn.validation import compare_with_frustrapy
+
+# Load model and predict
+model = FrustraMPNN.from_pretrained("checkpoint.ckpt")
+results = model.predict("protein.pdb", chains=["A"])
+
+# Compare with frustrapy (slow - calculates physics-based frustration)
+comparison = compare_with_frustrapy(
+    pdb_path="protein.pdb",
+    chain="A",
+    frustrampnn_results=results,
+)
+
+# View metrics
+print(f"Spearman correlation: {comparison.spearman:.3f}")
+print(f"Pearson correlation: {comparison.pearson:.3f}")
+print(f"RMSE: {comparison.rmse:.3f}")</code></pre>
+                    </div>
+
+                    <h3>Specific Positions</h3>
+                    <p>For large proteins, compare only specific positions:</p>
+                    <div class="code-block">
+<pre><code>comparison = compare_with_frustrapy(
+    pdb_path="protein.pdb",
+    chain="A",
+    frustrampnn_results=results,
+    positions=[50, 73, 120, 200],  # Only these positions
+)</code></pre>
+                    </div>
+
+                    <h3>Visualization</h3>
+                    <div class="code-block">
+<pre><code>fig = comparison.plot(
+    show_regression=True,
+    show_identity=True,
+    title="FrustraMPNN vs FrustratometeR"
+)
+fig.savefig("comparison.png", dpi=300)</code></pre>
+                    </div>
+                </section>
+
+                <!-- Containers -->
+                <section id="containers" class="doc-section">
+                    <h2>Docker and Singularity</h2>
+
+                    <h3>Docker</h3>
+                    <div class="code-block">
+<pre><code># Build image
+cd docker
+bash build_docker.sh
+
+# Run prediction
+bash docker/run_docker.sh predict \
+    --pdb /data/protein.pdb \
+    --checkpoint /data/model.ckpt \
+    --output /data/results.csv</code></pre>
+                    </div>
+
+                    <h3>With GPU</h3>
+                    <div class="code-block">
+<pre><code>docker run --gpus all -v $(pwd):/data frustrampnn:latest \
+    frustrampnn predict \
+    --pdb /data/protein.pdb \
+    --checkpoint /data/model.ckpt</code></pre>
+                    </div>
+
+                    <h3>Singularity (HPC)</h3>
+                    <div class="code-block">
+<pre><code># Build from Docker
+bash docker/build_singu_from_docker.sh
+
+# Run on cluster
+singularity exec --nv frustrampnn.sif frustrampnn predict \
+    --pdb protein.pdb \
+    --checkpoint model.ckpt</code></pre>
+                    </div>
+
+                    <h3>SLURM Job Script</h3>
+                    <div class="code-block">
+<pre><code>#!/bin/bash
+#SBATCH --job-name=frustrampnn
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=4:00:00
+
+module load singularity
+
+singularity exec --nv \
+    --bind $PWD:/data \
+    /path/to/frustrampnn.sif \
+    frustrampnn predict \
+    --pdb /data/protein.pdb \
+    --checkpoint /data/model.ckpt \
+    --output /data/results.csv</code></pre>
+                    </div>
+                </section>
+
+                <!-- Additional Resources -->
+                <section class="doc-section">
+                    <h2>Additional Resources</h2>
+                    <ul class="resource-links">
+                        <li><a href="https://github.com/schoederlab/frustraMPNN">GitHub Repository</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/tree/main/docs">Full Documentation</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/tree/main/notebooks">Jupyter Notebooks</a></li>
+                        <li><a href="https://github.com/engelberger/frustrapy">frustrapy (validation)</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/issues">Report Issues</a></li>
+                    </ul>
+                </section>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>FrustraMPNN</h4>
+                    <p>Ultra-fast deep learning for protein frustration analysis</p>
+                    <p>Released under the MIT License</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN">GitHub</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/issues">Issues</a></li>
+                        <li><a href="https://github.com/schoederlab/frustraMPNN/tree/main/docs">Documentation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Related</h4>
+                    <ul>
+                        <li><a href="https://github.com/engelberger/frustrapy">frustrapy</a></li>
+                        <li><a href="https://github.com/dauparas/ProteinMPNN">ProteinMPNN</a></li>
+                        <li><a href="https://github.com/Kuhlman-Lab/ThermoMPNN">ThermoMPNN</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 Schoeder Lab, Leipzig University. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <style>
+        /* Documentation-specific styles */
+        .lead {
+            font-size: 1.15rem;
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .doc-nav {
+            background: var(--color-background-alt);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .doc-nav ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--spacing-md) var(--spacing-xl);
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .doc-nav a {
+            font-weight: 500;
+        }
+
+        .doc-section {
+            padding-top: var(--spacing-2xl);
+            border-top: 1px solid var(--color-border);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .doc-section:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        .doc-section h3 {
+            margin-top: var(--spacing-xl);
+        }
+
+        .doc-section h3:first-of-type {
+            margin-top: 0;
+        }
+    </style>
+</body>
+</html>

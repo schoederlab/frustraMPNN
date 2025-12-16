@@ -1,0 +1,52 @@
+# FrustraMPNN GitHub Pages Configuration
+# Jekyll configuration for GitHub Pages deployment
+
+# Site settings
+title: FrustraMPNN
+description: >-
+  Ultra-fast deep learning tool for proteome-scale analysis of 
+  single-residue local energetic frustration profiles in proteins.
+baseurl: "/frustraMPNN"
+url: "https://schoederlab.github.io"
+
+# Repository
+repository: schoederlab/frustraMPNN
+
+# Theme (using minimal theme for scientific presentation)
+remote_theme: pages-themes/minimal@v0.2.0
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md
+
+# Include assets
+include:
+  - assets
+
+# Plugins
+plugins:
+  - jekyll-remote-theme
+  - jekyll-seo-tag
+
+# SEO settings
+author: Schoeder Lab
+twitter:
+  card: summary
+social:
+  name: FrustraMPNN
+  links:
+    - https://github.com/schoederlab/frustraMPNN
+
+# Google Analytics (optional - add tracking ID if needed)
+# google_analytics: UA-XXXXXXXX-X

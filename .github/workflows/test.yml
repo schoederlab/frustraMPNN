@@ -1,0 +1,82 @@
+# CI workflow for FrustraMPNN
+# Runs tests on multiple Python versions for PRs and pushes to main
+
+name: Test
+
+on:
+  push:
+    branches: [main, package-and-colab]
+  pull_request:
+    branches: [main, package-and-colab]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Run tests (excluding slow and integration)
+        run: |
+          uv run pytest tests/ -v --tb=short -m "not slow and not integration and not regression" --ignore=tests/test_regression.py
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.11'
+        uses: codecov/codecov-action@v4
+        with:
+          fail_ci_if_error: false
+        continue-on-error: true
+
+  # Separate job for integration tests (only on main branch)
+  integration:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: test
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Run integration tests
+        run: |
+          uv run pytest tests/ -v --tb=short -m "integration"
+
