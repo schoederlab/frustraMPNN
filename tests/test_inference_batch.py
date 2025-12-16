@@ -85,5 +85,3 @@ def test_predict_batch_combines_results():
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 2
     assert list(result["pdb"]) == ["pdb1", "pdb2"]
-
-

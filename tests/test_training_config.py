@@ -175,15 +175,17 @@ class TestTrainingConfigFromDictConfig:
         """Test creating config from OmegaConf DictConfig."""
         from omegaconf import OmegaConf
 
-        cfg = OmegaConf.create({
-            "project": "test",
-            "name": "run1",
-            "logger": "wandb",
-            "datasets": "combo",
-            "platform": {"accel": "cpu"},
-            "training": {"epochs": 50, "seed": 42},
-            "model": {"hidden_dims": [128, 64]},
-        })
+        cfg = OmegaConf.create(
+            {
+                "project": "test",
+                "name": "run1",
+                "logger": "wandb",
+                "datasets": "combo",
+                "platform": {"accel": "cpu"},
+                "training": {"epochs": 50, "seed": 42},
+                "model": {"hidden_dims": [128, 64]},
+            }
+        )
 
         config = TrainingConfig.from_dictconfig(cfg)
         assert config.project == "test"
@@ -199,13 +201,14 @@ class TestTrainingConfigFromDictConfig:
         """Test creating config from partial DictConfig."""
         from omegaconf import OmegaConf
 
-        cfg = OmegaConf.create({
-            "project": "test",
-        })
+        cfg = OmegaConf.create(
+            {
+                "project": "test",
+            }
+        )
 
         config = TrainingConfig.from_dictconfig(cfg)
         assert config.project == "test"
         # Should use defaults for missing keys
         assert config.training.epochs == 100
         assert config.model.hidden_dims == [64, 32]
-

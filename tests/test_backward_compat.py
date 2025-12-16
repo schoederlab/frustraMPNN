@@ -233,5 +233,3 @@ class TestImportCompatibility:
         assert len(ALPHABET) == 21  # 20 AAs + X
         assert AA_1_TO_3["A"] == "ALA"
         assert AA_3_TO_1["ALA"] == "A"
-
-

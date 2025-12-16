@@ -110,8 +110,7 @@ class TestInfoCommand:
         assert result.exit_code == 0
         # Should contain at least one author name
         assert any(
-            name in result.output
-            for name in ["Beining", "Engelberger", "Schoeder", "Meiler"]
+            name in result.output for name in ["Beining", "Engelberger", "Schoeder", "Meiler"]
         )
 
     def test_info_shows_pytorch_info(self) -> None:
@@ -180,7 +179,9 @@ class TestPredictCommandValidation:
 
         # Create a dummy PDB file
         pdb_file = tmp_path / "test.pdb"
-        pdb_file.write_text("ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n")
+        pdb_file.write_text(
+            "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+        )
 
         runner = CliRunner()
         result = runner.invoke(
@@ -199,7 +200,9 @@ class TestBatchCommandValidation:
 
         # Create a dummy PDB file
         pdb_file = tmp_path / "test.pdb"
-        pdb_file.write_text("ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n")
+        pdb_file.write_text(
+            "ATOM      1  N   ALA A   1       0.000   0.000   0.000  1.00  0.00           N\n"
+        )
 
         runner = CliRunner()
         result = runner.invoke(cli, ["batch", str(pdb_file)])
@@ -257,5 +260,3 @@ class TestCLIEntryPoint:
         # Should show help (exit code 0) or fail gracefully
         # Note: This may fail if package is not installed
         assert result.returncode == 0 or "No module named" in result.stderr
-
-

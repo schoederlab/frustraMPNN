@@ -4,7 +4,6 @@ This module tests the PDB parsing functions that extract structural
 information from PDB files for use in ProteinMPNN.
 """
 
-
 import numpy as np
 import pytest
 
@@ -53,9 +52,7 @@ class TestParsePDBBiounits:
             pytest.skip("Test PDB file not found")
 
         # Parse with N, CA, C, O
-        xyz, seq = parse_PDB_biounits(
-            str(test_pdb_path), atoms=["N", "CA", "C", "O"], chain="A"
-        )
+        xyz, seq = parse_PDB_biounits(str(test_pdb_path), atoms=["N", "CA", "C", "O"], chain="A")
 
         assert xyz.shape[1] == 4  # 4 atoms
 
@@ -461,4 +458,3 @@ END
         xyz, seq = parse_PDB_biounits(str(pdb_file), atoms=["CA"], chain="A")
 
         assert seq[0] == "MQI"
-

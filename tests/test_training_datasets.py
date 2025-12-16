@@ -88,17 +88,21 @@ class TestSequenceAlignment:
     @pytest.fixture
     def mock_alignment_no_gaps(self):
         """Create mock alignment without gaps."""
+
         class MockAlign:
             seqA = "ACDEF"
             seqB = "ACDEF"
+
         return MockAlign()
 
     @pytest.fixture
     def mock_alignment_with_gap(self):
         """Create mock alignment with gap in seqB."""
+
         class MockAlign:
             seqA = "ACDEF"
             seqB = "AC-EF"
+
         return MockAlign()
 
     def test_seq1_index_to_seq2_index_no_gaps(self, mock_alignment_no_gaps):
@@ -167,9 +171,11 @@ class TestMutationFiltering:
         """Test filtering multi-point mutations."""
         import pandas as pd
 
-        df = pd.DataFrame({
-            "mut_type": ["A1G", "A2G:B3C", "A3G"],
-        })
+        df = pd.DataFrame(
+            {
+                "mut_type": ["A1G", "A2G:B3C", "A3G"],
+            }
+        )
         df = df[~df["mut_type"].str.contains(":", na=False)]
         assert len(df) == 2
         assert "A1G" in df["mut_type"].values
@@ -179,9 +185,11 @@ class TestMutationFiltering:
         """Test filtering insertion mutations."""
         import pandas as pd
 
-        df = pd.DataFrame({
-            "mut_type": ["A1G", "ins_A1", "A3G"],
-        })
+        df = pd.DataFrame(
+            {
+                "mut_type": ["A1G", "ins_A1", "A3G"],
+            }
+        )
         df = df[~df["mut_type"].str.contains("ins", case=False, na=False)]
         assert len(df) == 2
 
@@ -189,9 +197,11 @@ class TestMutationFiltering:
         """Test filtering deletion mutations."""
         import pandas as pd
 
-        df = pd.DataFrame({
-            "mut_type": ["A1G", "del_A1", "A3G"],
-        })
+        df = pd.DataFrame(
+            {
+                "mut_type": ["A1G", "del_A1", "A3G"],
+            }
+        )
         df = df[~df["mut_type"].str.contains("del", case=False, na=False)]
         assert len(df) == 2
 
@@ -199,10 +209,12 @@ class TestMutationFiltering:
         """Test filtering missing frustration values."""
         import pandas as pd
 
-        df = pd.DataFrame({
-            "mut_type": ["A1G", "A2G", "A3G"],
-            "frustration": [0.5, "-", 0.7],
-        })
+        df = pd.DataFrame(
+            {
+                "mut_type": ["A1G", "A2G", "A3G"],
+                "frustration": [0.5, "-", 0.7],
+            }
+        )
         df = df[df["frustration"] != "-"]
         assert len(df) == 2
 
@@ -210,10 +222,12 @@ class TestMutationFiltering:
         """Test combined filtering of all invalid mutations."""
         import pandas as pd
 
-        df = pd.DataFrame({
-            "mut_type": ["A1G", "A2G:B3C", "ins_A1", "del_A1", "A5G"],
-            "frustration": [0.5, 0.6, 0.7, 0.8, "-"],
-        })
+        df = pd.DataFrame(
+            {
+                "mut_type": ["A1G", "A2G:B3C", "ins_A1", "del_A1", "A5G"],
+                "frustration": [0.5, 0.6, 0.7, 0.8, "-"],
+            }
+        )
 
         # Apply all filters
         df = df[~df["mut_type"].str.contains(":", na=False)]
@@ -223,4 +237,3 @@ class TestMutationFiltering:
 
         assert len(df) == 1
         assert df.iloc[0]["mut_type"] == "A1G"
-

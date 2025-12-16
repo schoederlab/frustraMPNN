@@ -198,4 +198,3 @@ class TestMetricTracker:
         tracker = MetricTracker(prefixes=["custom1", "custom2"])
         assert "custom1_metrics" in tracker.metrics
         assert "custom2_metrics" in tracker.metrics
-

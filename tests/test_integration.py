@@ -150,9 +150,7 @@ class TestMutationGenerationIntegration:
 class TestVisualizationIntegration:
     """Integration tests for visualization workflow."""
 
-    def test_plot_single_residue_with_data(
-        self, sample_frustration_df: pd.DataFrame
-    ) -> None:
+    def test_plot_single_residue_with_data(self, sample_frustration_df: pd.DataFrame) -> None:
         """Test single residue plot with sample data."""
         from frustrampnn.visualization import plot_single_residue
 
@@ -162,9 +160,7 @@ class TestVisualizationIntegration:
         axes = fig.get_axes()
         assert len(axes) == 1
 
-    def test_plot_heatmap_with_data(
-        self, sample_frustration_df: pd.DataFrame
-    ) -> None:
+    def test_plot_heatmap_with_data(self, sample_frustration_df: pd.DataFrame) -> None:
         """Test heatmap plot with sample data."""
         from frustrampnn.visualization import plot_frustration_heatmap
 
@@ -172,9 +168,7 @@ class TestVisualizationIntegration:
 
         assert fig is not None
 
-    def test_plot_single_residue_plotly(
-        self, sample_frustration_df: pd.DataFrame
-    ) -> None:
+    def test_plot_single_residue_plotly(self, sample_frustration_df: pd.DataFrame) -> None:
         """Test plotly single residue plot."""
         from frustrampnn.visualization import plot_single_residue_plotly
 
@@ -183,9 +177,7 @@ class TestVisualizationIntegration:
         assert fig is not None
         assert len(fig.data) > 0
 
-    def test_plot_heatmap_plotly(
-        self, sample_frustration_df: pd.DataFrame
-    ) -> None:
+    def test_plot_heatmap_plotly(self, sample_frustration_df: pd.DataFrame) -> None:
         """Test plotly heatmap plot."""
         from frustrampnn.visualization import plot_frustration_heatmap_plotly
 
@@ -408,12 +400,9 @@ class TestErrorHandlingIntegration:
         with pytest.raises(ValueError, match="Invalid mutation format"):
             parse_mutation_string("invalid")
 
-    def test_invalid_position_in_plot_error(
-        self, sample_frustration_df: pd.DataFrame
-    ) -> None:
+    def test_invalid_position_in_plot_error(self, sample_frustration_df: pd.DataFrame) -> None:
         """Test error handling for invalid position in plot."""
         from frustrampnn.visualization import plot_single_residue
 
         with pytest.raises(ValueError, match="No data found"):
             plot_single_residue(sample_frustration_df, position=999, chain="A")
-

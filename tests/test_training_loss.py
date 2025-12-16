@@ -152,10 +152,12 @@ class TestComputeBinWeights:
     def test_imbalanced_distribution(self):
         """Test weights for imbalanced distribution."""
         np.random.seed(42)
-        values = np.concatenate([
-            np.random.normal(-1, 0.1, 100),  # Many negative
-            np.random.normal(1, 0.1, 10),    # Few positive
-        ])
+        values = np.concatenate(
+            [
+                np.random.normal(-1, 0.1, 100),  # Many negative
+                np.random.normal(1, 0.1, 10),  # Few positive
+            ]
+        )
         weights = compute_bin_weights(values)
         # Positive samples should have higher weights
         assert weights.max() > weights.min()
@@ -299,4 +301,3 @@ class TestSampleReweighter:
         weights = np.array([1.0, 2.0, 3.0])
         normalized = reweighter.normalize_weights(weights, target_sum=10.0)
         assert normalized.sum() == pytest.approx(10.0)
-

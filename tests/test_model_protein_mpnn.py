@@ -90,5 +90,3 @@ def test_parse_pdb(test_pdb_path):
     assert len(result) > 0
     assert "seq" in result[0]
     assert "name" in result[0]
-
-

@@ -1,7 +1,6 @@
 """Tests for TransferModel module."""
 
 
-
 def test_transfer_model_import():
     """Test that TransferModel can be imported."""
     from frustrampnn.model import TransferModel
@@ -42,5 +41,3 @@ def test_get_metrics():
     assert "mse" in metrics
     assert "rmse" in metrics
     assert "spearman" in metrics
-
-

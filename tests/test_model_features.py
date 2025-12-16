@@ -61,9 +61,7 @@ class TestCAProteinFeatures:
         edge_features = 128
         node_features = 128
         top_k = min(5, seq_length)  # Ensure top_k <= seq_length
-        layer = CA_ProteinFeatures(
-            edge_features, node_features, top_k=top_k
-        )
+        layer = CA_ProteinFeatures(edge_features, node_features, top_k=top_k)
 
         E, E_idx = layer(
             sample_ca_coords,
@@ -171,9 +169,7 @@ class TestCAProteinFeatures:
         top_k = 5
         layer = CA_ProteinFeatures(64, 64, top_k=top_k)
 
-        D_neighbors, E_idx, mask_neighbors = layer._dist(
-            sample_ca_coords, sample_mask
-        )
+        D_neighbors, E_idx, mask_neighbors = layer._dist(sample_ca_coords, sample_mask)
 
         batch_size, seq_length = sample_ca_coords.shape[:2]
         assert D_neighbors.shape == (batch_size, seq_length, top_k)
@@ -215,9 +211,7 @@ class TestProteinFeatures:
         edge_features = 128
         node_features = 128
         top_k = min(5, seq_length)
-        layer = ProteinFeatures(
-            edge_features, node_features, top_k=top_k
-        )
+        layer = ProteinFeatures(edge_features, node_features, top_k=top_k)
 
         E, E_idx = layer(
             sample_backbone_coords,
@@ -426,4 +420,3 @@ class TestFeatureEdgeCases:
 
         assert E.shape == (1, 10, 3, 64)
         assert not torch.isnan(E).any()
-

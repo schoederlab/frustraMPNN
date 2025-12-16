@@ -146,5 +146,3 @@ def test_frustrampnn_integration(test_pdb_path):
     # This test requires a checkpoint to be available
     # Skip if not in the right environment
     pass
-
-

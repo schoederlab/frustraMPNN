@@ -1,7 +1,6 @@
 """Basic package tests."""
 
 
-
 def test_import():
     """Test that package can be imported."""
     import frustrampnn
@@ -30,6 +29,3 @@ def test_submodules_exist():
     assert visualization is not None
     assert validation is not None
     assert cli is not None
-
-
-

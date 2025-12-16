@@ -168,9 +168,7 @@ def test_plot_single_residue_custom_title(mock_frustration_data):
     from frustrampnn.visualization import plot_single_residue
 
     custom_title = "My Custom Title"
-    fig = plot_single_residue(
-        mock_frustration_data, position=0, chain="A", title=custom_title
-    )
+    fig = plot_single_residue(mock_frustration_data, position=0, chain="A", title=custom_title)
 
     axes = fig.get_axes()
     assert axes[0].get_title() == custom_title
@@ -180,9 +178,7 @@ def test_plot_single_residue_no_thresholds(mock_frustration_data):
     """Test plot without threshold lines."""
     from frustrampnn.visualization import plot_single_residue
 
-    fig = plot_single_residue(
-        mock_frustration_data, position=0, chain="A", show_thresholds=False
-    )
+    fig = plot_single_residue(mock_frustration_data, position=0, chain="A", show_thresholds=False)
     assert fig is not None
 
 
@@ -405,12 +401,14 @@ def mock_native_frustration_data() -> pd.DataFrame:
         else:
             category = "minimally"
             value = 1.0
-        data.append({
-            "position": pos,
-            "wildtype": wt,
-            "frustration": value,
-            "category": category,
-        })
+        data.append(
+            {
+                "position": pos,
+                "wildtype": wt,
+                "frustration": value,
+                "category": category,
+            }
+        )
     return pd.DataFrame(data)
 
 
@@ -430,12 +428,14 @@ def mock_calculated_frustration_data() -> pd.DataFrame:
         else:
             category = "minimally"
             value = 1.0
-        data.append({
-            "position": pos,
-            "wildtype": wt,
-            "frustration": value,
-            "category": category,
-        })
+        data.append(
+            {
+                "position": pos,
+                "wildtype": wt,
+                "frustration": value,
+                "category": category,
+            }
+        )
     return pd.DataFrame(data)
 
 
@@ -538,9 +538,7 @@ def test_compute_category_flows_import():
     assert callable(compute_category_flows)
 
 
-def test_compute_category_flows(
-    mock_native_frustration_data, mock_calculated_frustration_data
-):
+def test_compute_category_flows(mock_native_frustration_data, mock_calculated_frustration_data):
     """Test computing category flows."""
     from frustrampnn.visualization import compute_category_flows
 
@@ -642,5 +640,3 @@ def cleanup_matplotlib():
 
     yield
     plt.close("all")
-
-

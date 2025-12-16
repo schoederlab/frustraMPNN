@@ -69,9 +69,7 @@ class TestReferenceOutput:
         positions = reference_df["position"].unique()
         expected_positions = list(range(76))
 
-        assert sorted(positions) == expected_positions, (
-            "Positions should be 0-indexed from 0 to 75"
-        )
+        assert sorted(positions) == expected_positions, "Positions should be 0-indexed from 0 to 75"
 
     def test_reference_mutations(self, reference_df: pd.DataFrame) -> None:
         """Verify all 20 amino acids are present for each position."""
@@ -176,12 +174,14 @@ def compare_predictions(
         results["passed"] = False
         mismatch_rows = merged[diffs > tolerance].head(10)
         for _, row in mismatch_rows.iterrows():
-            results["details"].append({
-                "key": row["_key"],
-                "reference": row["frustration_pred_ref"],
-                "test": row["frustration_pred_test"],
-                "diff": abs(row["frustration_pred_ref"] - row["frustration_pred_test"]),
-            })
+            results["details"].append(
+                {
+                    "key": row["_key"],
+                    "reference": row["frustration_pred_ref"],
+                    "test": row["frustration_pred_test"],
+                    "diff": abs(row["frustration_pred_ref"] - row["frustration_pred_test"]),
+                }
+            )
 
     return results
 
@@ -422,4 +422,3 @@ class TestComparisonScript:
         assert result.returncode == 0
         assert "--reference" in result.stdout
         assert "--tolerance" in result.stdout
-
