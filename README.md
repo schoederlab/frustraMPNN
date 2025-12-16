@@ -324,12 +324,12 @@ fig.show()
 If you use FrustraMPNN in your research, please cite:
 
 ```bibtex
-@article{beining2024frustrampnn,
+@article{beining2026frustrampnn,
   title={FrustraMPNN: Ultra-fast deep learning prediction of single-residue local energetic frustration},
   author={Beining, Max and Engelberger, Felipe and Schoeder, Clara T. and Ram{\'\i}rez-Sarmiento, C{\'e}sar A. and Meiler, Jens},
-  journal={bioRxiv},
-  year={2024},
-  doi={10.1101/2024.XX.XX.XXXXXX}
+  journal={XXXXXXXXXX},
+  year={2026},
+  doi={10.1101/2026.XX.XX.XXXXXX}
 }
 ```
 
