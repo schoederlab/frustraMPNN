@@ -1,0 +1,69 @@
+# Lint workflow for FrustraMPNN
+# Runs ruff linting and formatting checks
+
+name: Lint
+
+on:
+  push:
+    branches: [main, package-and-colab]
+  pull_request:
+    branches: [main, package-and-colab]
+
+concurrency:
+  group: lint-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --extra dev
+
+      - name: Run ruff linter
+        run: |
+          uv run ruff check src/ tests/
+
+      - name: Run ruff formatter check
+        run: |
+          uv run ruff format --check src/ tests/
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: |
+          uv sync --all-extras
+
+      - name: Run mypy
+        run: |
+          uv run mypy src/frustrampnn --ignore-missing-imports
+        continue-on-error: true  # Type checking is advisory for now
+

@@ -1,0 +1,69 @@
+agents/*
+
+# Test data - keep reference outputs, ignore generated test outputs
+test_data/test_output.csv
+test_data/*.pdb
+!test_data/1UBQ_reference_output.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data files (large)
+*.ckpt
+*.pt
+!inference/vanilla_model_weights/*.pt
+!training/vanilla_model_weights/*.pt
+*.zip
+data_csv_*/
+pdb_files/
+
+# Logs
+*.log
+wandb/
+lightning_logs/
+
+# ESM models cache
+esm_models/
+
+# Temporary test outputs (not test files)
+test_output/
+test_results/
+test_data
+ag*
+A*.md
+docs/pl*
