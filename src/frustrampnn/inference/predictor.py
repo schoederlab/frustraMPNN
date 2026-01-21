@@ -159,6 +159,7 @@ class FrustraMPNN:
                 cfg=cfg,
                 strict=False,
                 map_location=map_location,
+                weights_only=False
             )
 
         return cls(model_pl.model, cfg, device)
