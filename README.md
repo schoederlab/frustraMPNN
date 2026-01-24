@@ -1,6 +1,6 @@
 # FrustraMPNN
 
-Ultra-fast deep learning prediction of single-residue local energetic frustration in proteins.
+Ultra-fast deep learning prediction of single-residue local energetic frustration in proteins. This repo contains the inference code for the preprint **[FrustraMPNN: An ultra-fast deep learning tool for proteome-scale analysis of deep mutational single-residue local energetic frustration in proteins](https://doi.org/10.64898/2026.01.22.701012)**
 
 FrustraMPNN is a message-passing neural network trained via transfer learning from ProteinMPNN to predict frustration profiles 1,000-4,500x faster than physics-based methods.
 
